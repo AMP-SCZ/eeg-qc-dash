@@ -23,17 +23,17 @@ if not ROOTDIR:
     print('Define env var EEG_QC_PHOENIX and try again')
     exit(1)
 dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
-print(dirs)
+# print(dirs)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True,
-                title='EEG Qc Tool')
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG Qc Tool', assets_folder="/data/predict/kcho/flow_test/spero/Pronet/PHOENIX/PROTECTED/", assets_url_path="/")
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 app.layout= html.Div(
-    children= [
-        html.H1("Hello world"), html.Br()]+ [html.H5(d) for d in dirs]
+    children= [html.Br(), html.Img(src="PronetPI/processed/PI00034/eeg/ses-20220121/Figures/PI00034_20220121_QCcounts.png")]+ \
+[html.H1("Hello world"), html.Br()]+ \
+        [html.H5(d) for d in dirs]
 )
 
 if __name__=='__main__':
