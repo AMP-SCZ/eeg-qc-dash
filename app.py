@@ -5,6 +5,8 @@ import dash
 from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
+import dash_bootstrap_components as dbc
+
 from os.path import isfile, isdir, abspath, join as pjoin, dirname, splitext, basename
 from os import makedirs, getenv, remove, listdir
 
@@ -23,10 +25,10 @@ if not ROOTDIR:
     print('Define env var EEG_QC_PHOENIX and try again')
     exit(1)
 dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
-# print(dirs)
+print(ROOTDIR)
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG Qc Tool', assets_folder="/data/predict/kcho/flow_test/spero/Pronet/PHOENIX/PROTECTED/", assets_url_path="/")
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP]
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG Qc Tool', assets_folder=ROOTDIR, assets_url_path="/")
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
@@ -45,8 +47,6 @@ app.layout= html.Div(
         html.Br()
     ]
 
-    # html.Br(), html.Img(src="PronetPI/processed/PI00034/eeg/ses-20220121/Figures/PI00034_20220121_QCcounts.png")]+ \
-    # [html.H1("Hello world"), html.Br()]+ [html.H5(d) for d in dirs]
 )
 
 suffixes= "_QCimpedance, _QClineNoise, _QCcounts, _QCresponseAccuracy, _QCresponseTimes, _QCrestAlpha".split(', ')
@@ -55,17 +55,22 @@ suffixes= "_QCimpedance, _QClineNoise, _QCcounts, _QCresponseAccuracy, _QCrespon
     [Input('start','value'), Input('end','value'), Input('date-filter', 'n_clicks')])
 def render_table(start, end, click):
 
-    df= pd.DataFrame(columns=['sub-id','ses-id']+ suffixes)
-    for i,d in enumerate(dirs):
+    # df= pd.DataFrame(columns=['sub-id','ses-id']+ suffixes)
+    rows= []
+    for i,d in enumerate(dirs[:3]):
         parts= d.split('/')
         sub= parts[-4]
         ses= parts[-2].split('-')[1]
         imgs= glob(f'{d}/*_QC*png')
-        # df.loc[i]= [sub, ses]+ [html.Img(src=img) for img in imgs[:6]]
-        df.loc[i]= [sub, ses]+ ['data:image/png;base64,{}'.format(base64.b64encode(open(img, 'rb').read()).decode('ascii')) \
-            for img in imgs[:6]]
+        imgs= [img for img in imgs if not img.endswith('_QC.png')]
+        
+        rows.append(
+            dbc.Row(
+                [dbc.Col(html.Div(sub)), dbc.Col(html.Div(ses))]+ \
+                [dbc.Col(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
+            )
+        )
 
-    # 'data:image/png;base64,{}'.format(base64.b64encode(open(img, 'rb').read()).decode('ascii'))
 
     if click and start and end:
         start=""
@@ -74,7 +79,7 @@ def render_table(start, end, click):
         # filter the data
 
     
-    return dash_table.DataTable(df.to_dict('records'), [{"name": i, "id": i} for i in df.columns])
+    return rows
 
 
 # TODO
