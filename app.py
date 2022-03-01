@@ -27,7 +27,7 @@ if not ROOTDIR:
 dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
 print(ROOTDIR)
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP]
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP,'styles.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG Qc Tool', assets_folder=ROOTDIR, assets_url_path="/")
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
@@ -67,7 +67,7 @@ def render_table(start, end, click):
         rows.append(
             dbc.Row(
                 [dbc.Col(html.Div(sub)), dbc.Col(html.Div(ses))]+ \
-                [dbc.Col(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
+                [dbc.Col(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs[3:]]
             )
         )
 
