@@ -31,10 +31,54 @@ log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 app.layout= html.Div(
-    children= [html.Br(), html.Img(src="PronetPI/processed/PI00034/eeg/ses-20220121/Figures/PI00034_20220121_QCcounts.png")]+ \
-[html.H1("Hello world"), html.Br()]+ \
-        [html.H5(d) for d in dirs]
+    children= [
+        html.H3('EEG Qc Tool'),
+
+        html.Div(dcc.Input(id='start')), '--', html.Div(dcc.Input(id='end')),
+        html.Div(html.Button('Filter', id='date-filter', n_clicks=0)),
+
+        html.Button('Save', id='save'),
+        html.Div(id='last-save'),
+
+        html.Hr(),
+        html.Div(id='table'),
+        html.Br()
+    ]
+
+    # html.Br(), html.Img(src="PronetPI/processed/PI00034/eeg/ses-20220121/Figures/PI00034_20220121_QCcounts.png")]+ \
+    # [html.H1("Hello world"), html.Br()]+ [html.H5(d) for d in dirs]
 )
+
+suffixes= "_QCimpedance, _QClineNoise, _QCcounts, _QCresponseAccuracy, _QCresponseTimes, _QCrestAlpha".split(', ')
+
+@app.callback(Output('table','children'),
+    [Input('start','value'), Input('end','value'), Input('date-filter', 'n_clicks')])
+def render_table(start, end, click):
+
+    df= pd.DataFrame(columns=['sub-id','ses-id']+ suffixes)
+    for i,d in enumerate(dirs):
+        parts= d.split('/')
+        sub= parts[-4]
+        ses= parts[-2].split('-')[1]
+        imgs= glob(f'{d}/*_QC*png')
+        # df.loc[i]= [sub, ses]+ [html.Img(src=img) for img in imgs[:6]]
+        df.loc[i]= [sub, ses]+ ['data:image/png;base64,{}'.format(base64.b64encode(open(img, 'rb').read()).decode('ascii')) \
+            for img in imgs[:6]]
+
+    # 'data:image/png;base64,{}'.format(base64.b64encode(open(img, 'rb').read()).decode('ascii'))
+
+    if click and start and end:
+        start=""
+        end=""
+        
+        # filter the data
+
+    
+    return dash_table.DataTable(df.to_dict('records'), [{"name": i, "id": i} for i in df.columns])
+
+
+# TODO
+# callback for save and last-save
 
 if __name__=='__main__':
     app.run_server(debug=True, host='localhost')
