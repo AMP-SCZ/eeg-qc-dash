@@ -126,7 +126,7 @@ def render_table(start, end, site, qcimg, click):
     # filter by technician
 
 
-    headers= ['Subject','Session']+ suffixes
+    headers= ['Subject','Session']+ qcimg
     rows= [dbc.Row([dbc.Col(html.Div(h)) for h in headers])]
     for i,d in enumerate(dirs):
         parts= d.split('/')
@@ -134,7 +134,6 @@ def render_table(start, end, site, qcimg, click):
         ses= parts[-2].split('-')[1]
         imgs= glob(f'{d}/*[!QC].png')
  
-        print(imgs)
 
         # filter by columns
         if qcimg:
@@ -146,7 +145,7 @@ def render_table(start, end, site, qcimg, click):
 
             imgs= imgs2.copy()
  
-        print(imgs)
+        # print(imgs)
  
         rows.append(
             dbc.Row(
@@ -154,7 +153,7 @@ def render_table(start, end, site, qcimg, click):
                 [dbc.Col(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
             )
         )
-
+ 
 
     # callback for save and last-save
 
