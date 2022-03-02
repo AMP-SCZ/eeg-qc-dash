@@ -55,7 +55,8 @@ app.layout= html.Div(
             dbc.Col(html.Div(dcc.Input(id='site',placeholder='site'))),
             
             # column filter
-            dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown', options=suffixes, multi=True, placeholder='column(s)'))),
+            dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
+                options=suffixes, multi=True, placeholder='column(s)',value=['_QCresponseAccuracy','_QCresponseTime']))),
 
             # QC score filter
             dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',options=[1,2,3,4]))),
@@ -89,8 +90,10 @@ app.layout= html.Div(
 def render_table(start, end, site, qcimg, click):
 
     changed = [p['prop_id'] for p in callback_context.triggered][0]
-    if 'global-filter' not in changed:
-        raise PreventUpdate
+    if click>0:
+        if 'global-filter' not in changed:
+            raise PreventUpdate
+
 
     dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
 
