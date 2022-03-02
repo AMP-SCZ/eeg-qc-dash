@@ -24,20 +24,47 @@ ROOTDIR= getenv("EEG_QC_PHOENIX")
 if not ROOTDIR:
     print('Define env var EEG_QC_PHOENIX and try again')
     exit(1)
-dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
-# print(ROOTDIR)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP,'styles.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG Qc Tool', assets_folder=ROOTDIR, assets_url_path="/")
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
+suffixes= "_QCimpedance, _QClineNoise, _QCcounts, _QCresponseAccuracy, _QCresponseTimes, _QCrestAlpha".split(', ')
+
 app.layout= html.Div(
     children= [
-        html.H3('EEG Qc Tool'),
+        html.H3('EEG Quality Checking Tool'),
+        html.Hr(),
+        'Provide values for filtering:',
+        html.Br(),
+        html.Br(),
 
-        html.Div([dcc.Input(id='start'), '--', dcc.Input(id='end'),
-            html.Button('Filter', id='date-filter', n_clicks=0)]),
+        dbc.Row([
+            # date filter
+            dbc.Col(
+                html.Div([
+                    dcc.Input(id='start',placeholder='yyyy/mm/dd'),
+                    '--',
+                    dcc.Input(id='end',placeholder='yyyy/mm/dd'),
+                ])
+            ),
+
+            # site filter
+            dbc.Col(html.Div(dcc.Input(id='site',placeholder='site'))),
+            
+            # column filter
+            dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown', options=suffixes, multi=True, placeholder='column(s)'))),
+
+            # QC score filter
+            dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',options=[1,2,3,4]))),
+
+            # technician filter
+            dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician'))),
+            
+            # filter button
+            dbc.Col(html.Button('Filter', id='date-filter', n_clicks=0))
+        ]),
         
         html.Br(),
         html.Button('Save', id='save'),
@@ -51,13 +78,14 @@ app.layout= html.Div(
 
 )
 
-suffixes= "_QCimpedance, _QClineNoise, _QCcounts, _QCresponseAccuracy, _QCresponseTimes, _QCrestAlpha".split(', ')
+
 
 @app.callback(Output('table','children'),
     [Input('start','value'), Input('end','value'), Input('date-filter', 'n_clicks')])
 def render_table(start, end, click):
 
-    # df= pd.DataFrame(columns=['sub-id','ses-id']+ suffixes)
+    dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
+
     headers= ['Subject','Session']+ suffixes[3:]
     rows= [dbc.Row([dbc.Col(html.Div(h)) for h in headers])]
     for i,d in enumerate(dirs):
@@ -100,10 +128,8 @@ def render_table(start, end, click):
 # filter by technician
 
 
-
-
-# TODO
 # callback for save and last-save
+
 
 if __name__=='__main__':
     app.run_server(debug=True, host='localhost')
