@@ -31,7 +31,7 @@ app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callbac
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-suffixes= "_QCimpedance, _QClineNoise, _QCcounts, _QCresponseAccuracy, _QCresponseTimes, _QCrestAlpha".split(', ')
+suffixes= "_QCimpedance, _QClineNoise, _QCcounts, _QCresponseAccuracy, _QCresponseTime, _QCrestAlpha".split(', ')
 
 app.layout= html.Div(
     children= [
@@ -84,8 +84,9 @@ app.layout= html.Div(
 @app.callback(Output('table','children'),
     [Input('start','value'), Input('end','value'),
     Input('site','value'),
+    Input('qcimg','value'),
     Input('global-filter', 'n_clicks')])
-def render_table(start, end, site, click):
+def render_table(start, end, site, qcimg, click):
 
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     if 'global-filter' not in changed:
@@ -110,25 +111,11 @@ def render_table(start, end, site, click):
 
     # filter by site
     if site:
-        # ./PHOENIX/PROTECTED/PronetLA/processed/LA00012/eeg/ses-20211118/Figures
+        # example d: PHOENIX/PROTECTED/PronetLA/processed/LA00012/eeg/ses-20211118/Figures
+        # prepend / to facilitiate filtering
         site= '/'+site 
         dirs= [d for d in dirs if site in d]
 
-
-    # filter by columns
-    '''
-    imgs=[]
-    if qcimg:
-        for d in dirs:
-            for q in qcimg:
-                imgs.append(glob(f'{d}/*{q}.png'))
-
-    else:
-        for d in dirs:
-            imgs.append(glob(f'{d}/*_[!QC].png'))
-            
-    imgs2= [img for img in list1 for list1 in imgs]
-    '''
 
     # filter by QC score
 
@@ -136,9 +123,6 @@ def render_table(start, end, site, click):
     # filter by technician
 
 
-    # callback for save and last-save
-
-    print(dirs)
     headers= ['Subject','Session']+ suffixes
     rows= [dbc.Row([dbc.Col(html.Div(h)) for h in headers])]
     for i,d in enumerate(dirs):
@@ -146,15 +130,30 @@ def render_table(start, end, site, click):
         sub= parts[-4]
         ses= parts[-2].split('-')[1]
         imgs= glob(f'{d}/*[!QC].png')
-        
-        print(imgs)  
-         
+ 
+        print(imgs)
+
+        # filter by columns
+        if qcimg:
+            imgs2=[]
+            for img in imgs:
+                for q in qcimg:
+                    if img.endswith(f'{q}.png'):
+                        imgs2.append(img)
+
+            imgs= imgs2.copy()
+ 
+        print(imgs)
+ 
         rows.append(
             dbc.Row(
                 [dbc.Col(html.Div(sub)), dbc.Col(html.Div(ses))]+ \
                 [dbc.Col(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
             )
         )
+
+
+    # callback for save and last-save
 
     
     return rows
