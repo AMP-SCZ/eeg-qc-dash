@@ -25,7 +25,7 @@ if not ROOTDIR:
     print('Define env var EEG_QC_PHOENIX and try again')
     exit(1)
 dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
-print(ROOTDIR)
+# print(ROOTDIR)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP,'styles.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG Qc Tool', assets_folder=ROOTDIR, assets_url_path="/")
@@ -36,12 +36,14 @@ app.layout= html.Div(
     children= [
         html.H3('EEG Qc Tool'),
 
-        html.Div(dcc.Input(id='start')), '--', html.Div(dcc.Input(id='end')),
-        html.Div(html.Button('Filter', id='date-filter', n_clicks=0)),
-
+        html.Div([dcc.Input(id='start'), '--', dcc.Input(id='end'),
+            html.Button('Filter', id='date-filter', n_clicks=0)]),
+        
+        html.Br(),
         html.Button('Save', id='save'),
         html.Div(id='last-save'),
 
+        html.Br(),
         html.Hr(),
         html.Div(id='table'),
         html.Br()
@@ -56,8 +58,9 @@ suffixes= "_QCimpedance, _QClineNoise, _QCcounts, _QCresponseAccuracy, _QCrespon
 def render_table(start, end, click):
 
     # df= pd.DataFrame(columns=['sub-id','ses-id']+ suffixes)
-    rows= []
-    for i,d in enumerate(dirs[:3]):
+    headers= ['Subject','Session']+ suffixes[3:]
+    rows= [dbc.Row([dbc.Col(html.Div(h)) for h in headers])]
+    for i,d in enumerate(dirs):
         parts= d.split('/')
         sub= parts[-4]
         ses= parts[-2].split('-')[1]
@@ -80,6 +83,23 @@ def render_table(start, end, click):
 
     
     return rows
+
+
+# filter by date
+
+
+# filter by site
+
+
+# filter by columns
+
+
+# filter by QC score
+
+
+# filter by technician
+
+
 
 
 # TODO
