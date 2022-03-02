@@ -1,0 +1,25 @@
+body {
+    margin: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+input#start {
+    margin-right: 10px;
+}
+
+input#end {
+    margin: 10px;
+}
+
+
+#table .row {
+    border-bottom: solid 0.5px gray;
+    padding: 10px;
+}
+#table .col {
+    border-right: solid 0.5px gray;
+    padding: 10px;
+}
+
+
