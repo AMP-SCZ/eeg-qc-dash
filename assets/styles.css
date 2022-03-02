@@ -9,7 +9,15 @@ input#start {
 }
 
 input#end {
-    margin: 10px;
+    margin-left: 10px;
+}
+
+input {
+    width: 90px;
+}
+
+.ddown {
+    width: 150px;
 }
 
 
