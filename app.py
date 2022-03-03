@@ -57,10 +57,12 @@ app.layout= html.Div(
             
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
-                options=suffixes, multi=True, placeholder='column(s)',value=['_QCresponseAccuracy','_QCresponseTime']))),
+                options=suffixes, multi=True, placeholder='column(s)',
+                value=['_QCresponseAccuracy','_QCresponseTime']))),
 
             # QC score filter
-            dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',options=[0,1,2,3,4]))),
+            dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
+                options=[0,1,2,3,4]))),
 
             # technician filter
             dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
