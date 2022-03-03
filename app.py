@@ -93,13 +93,15 @@ props_file= '.scores.pkl'
 def render_table(start, end, site, qcimg, click):
 
     changed = [p['prop_id'] for p in callback_context.triggered][0]
-    if click>0:
-        if 'global-filter' not in changed:
-            raise PreventUpdate
+    # trigger initial callback but condition future callbacks
+    if changed=='.':
+        pass
+    elif (start or end or site or qcimg) and ('global-filter' not in changed):
+        raise PreventUpdate
 
-    print('inside render_table')
-   
- 
+    
+    print('executing render_table')
+    
     dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
 
 
@@ -193,7 +195,7 @@ def save_data(click,scores,ids,props):
     if 'save' not in changed:
         raise PreventUpdate
 
-    print('inside save_data')
+    print('executing save_data')
 
     # load all scores 
     with open(props_file,'rb') as f:
