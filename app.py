@@ -74,14 +74,16 @@ app.layout= html.Div(
         html.Br(),
         html.Hr(),
         html.Div(id='table'),
-        html.Br()
+        html.Br(),
+        dcc.Store(id='properties')
     ]
 
 )
 
 
 
-@app.callback(Output('table','children'),
+@app.callback([Output('table','children'),
+    Output('properties','data')],
     [Input('start','value'), Input('end','value'),
     Input('site','value'),
     Input('qcimg','value'),
@@ -124,6 +126,7 @@ def render_table(start, end, site, qcimg, click):
     if not isfile('.scores.csv'):
         # initialize scores
         df= pd.DataFrame(columns=['sub','ses','score'])
+        props={}
     else:
         # load scores
         df= pd.read_csv('.scores.csv')
@@ -141,7 +144,8 @@ def render_table(start, end, site, qcimg, click):
        
         # initialize scores 
         if not isfile('.scores.csv'):
-            df.loc[i]= [sub, ses, 4]
+            # df.loc[i]= [sub, ses, 0]
+            props[f'{sub}_{ses}']=0
 
         # filter by columns
         if qcimg:
@@ -159,7 +163,7 @@ def render_table(start, end, site, qcimg, click):
             dbc.Row(
                 [dbc.Col(html.Div(sub)), dbc.Col(html.Div(ses))]+ \
                 # [dbc.Col(dcc.Dropdown(value=df.loc[i]['score'], id= {'sub':sub,'ses':ses}, options=[1,2,3,4]))]+ \
-                [dbc.Col(dcc.Dropdown(value=df.loc[i]['score'], id= {'sub_ses':f'{sub}_{ses}'}, options=[1,2,3,4]))]+ \
+                [dbc.Col(dcc.Dropdown(value=props[f'{sub}_{ses}'], id= {'sub_ses':f'{sub}_{ses}'}, options=[0,1,2,3,4]))]+ \
                 [dbc.Col(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
             )
         )
@@ -168,28 +172,35 @@ def render_table(start, end, site, qcimg, click):
     # callback for save and last-save
 
     
-    return rows
+    return rows,props
 
 
 @app.callback(Output('last-saved','children'),
     [Input('save','n_clicks'),
     Input({'sub_ses':ALL},'value'),
-    Input({'sub_ses':ALL},'id')])
-def save_data(click,scores,ids):
+    Input({'sub_ses':ALL},'id'),
+    Input('properties','data')])
+def save_data(click,scores,ids,props):
     if click>0:
         # read all sub, ses, score dropdown
         # save them in .scores.csv
         # populate status in last-save
         pass
         
-        for sub_ses,s in zip(ids,scores):
-            print(sub_ses,s)
+        # print(props)
+ 
+        for n,s in zip(ids,scores):
+            print(n,s)
+            props[n['sub_ses']]=s
+
+        # save props.npy
         
         # return 'Last saved on '+ datetime.now().ctime()
     
-    print(callback_context.states_list)
+        print(props) 
 
     raise PreventUpdate
+
 
 if __name__=='__main__':
     app.run_server(debug=True, host='localhost')
