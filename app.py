@@ -71,13 +71,18 @@ app.layout= html.Div(
             dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0))
         ]),
         
+        dcc.Loading(html.Div(id='loading'),type='cube'),
+        
         html.Br(),
         html.Div([html.Button('Save', id='save', n_clicks=0), html.Div(id='last-saved')]),
         html.Br(),
         html.Br(),
+
         html.Div(id='table'),
         html.Br(),
+        
         dcc.Store(id='properties')
+
     ]
 
 )
@@ -87,7 +92,8 @@ props_file= '.scores.pkl'
 
 
 @app.callback([Output('table','children'),
-    Output('properties','data')],
+    Output('properties','data'),
+    Output('loading','children')],
     [Input('start','value'), Input('end','value'),
     Input('site','value'),
     Input('qcimg','value'),
@@ -194,7 +200,7 @@ def render_table(start, end, site, qcimg, score, click):
         bordered=True,
         hover=True)
 
-    return table,props
+    return table,props,True
 
 
 
