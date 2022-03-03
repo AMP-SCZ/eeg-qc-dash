@@ -60,7 +60,7 @@ app.layout= html.Div(
                 options=suffixes, multi=True, placeholder='column(s)',value=['_QCresponseAccuracy','_QCresponseTime']))),
 
             # QC score filter
-            dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',options=[1,2,3,4]))),
+            dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',options=[0,1,2,3,4]))),
 
             # technician filter
             dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
@@ -89,14 +89,15 @@ props_file= '.scores.pkl'
     [Input('start','value'), Input('end','value'),
     Input('site','value'),
     Input('qcimg','value'),
+    Input('score','value'),
     Input('global-filter', 'n_clicks')])
-def render_table(start, end, site, qcimg, click):
+def render_table(start, end, site, qcimg, score, click):
 
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     # trigger initial callback but condition future callbacks
     if changed=='.':
         pass
-    elif (start or end or site or qcimg) and ('global-filter' not in changed):
+    elif (start or end or site or qcimg or score) and ('global-filter' not in changed):
         raise PreventUpdate
 
     
@@ -125,10 +126,6 @@ def render_table(start, end, site, qcimg, click):
         # prepend / to facilitiate filtering
         site= '/'+site 
         dirs= [d for d in dirs if site in d]
-
-
-    # TODO 
-    # filter by QC score
 
 
     if not isfile(props_file):
@@ -167,6 +164,12 @@ def render_table(start, end, site, qcimg, click):
             imgs= imgs2.copy()
  
         # print(imgs)
+        
+        # filter by QC score
+        # although this filter is similar to by date and by site
+        # it is placed inside the for loop to take advantage of sub_ses
+        if score is not None and props[f'{sub}_{ses}']!=score:
+            continue
  
         rows.append(
             dbc.Row(
@@ -205,7 +208,7 @@ def save_data(click,scores,ids,props):
     for n,s in zip(ids,scores):
         props[n['sub_ses']]=s
 
-    print(props)
+    # print(props)
 
     # save all scores
     with open(props_file,'wb') as f:
