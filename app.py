@@ -142,7 +142,7 @@ def render_table(start, end, site, qcimg, score, click):
 
 
     headers= ['Subject','Session', 'Score']+ qcimg
-    head= [html.Tr([html.Th(html.Div(h)) for h in headers])]
+    head= [html.Tr([html.Th(h) for h in headers])]
     body=[]
     for i,d in enumerate(dirs):
         parts= d.split('/')
@@ -174,8 +174,9 @@ def render_table(start, end, site, qcimg, score, click):
  
         body.append(
             html.Tr(
-                [html.Td(html.Div(sub)), html.Td(html.Div(ses))]+ \
-                [html.Td(dcc.Dropdown(value=props[f'{sub}_{ses}'], id= {'sub_ses':f'{sub}_{ses}'}, options=[0,1,2,3,4]))]+ \
+                [html.Td(sub), html.Td(ses)]+ \
+                [html.Td(dcc.Dropdown(value=props[f'{sub}_{ses}'],
+                    id= {'sub_ses':f'{sub}_{ses}'}, options=[0,1,2,3,4]))]+ \
                 [html.Td(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
             )
         )
