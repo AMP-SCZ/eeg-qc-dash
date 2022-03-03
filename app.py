@@ -124,7 +124,7 @@ def render_table(start, end, site, qcimg, score, click):
     if site:
         # example d: PHOENIX/PROTECTED/PronetLA/processed/LA00012/eeg/ses-20211118/Figures
         # prepend / to facilitiate filtering
-        site= '/'+site 
+        # site= '/'+site
         dirs= [d for d in dirs if site in d]
 
 
