@@ -1,7 +1,7 @@
 body {
     margin: 20px;
     font-size: 12px;
-    font-weight: bold;
+    // font-weight: bold;
 }
 
 input#start {
@@ -17,10 +17,10 @@ input {
 }
 
 .ddown {
-    width: 150px;
+    width: 200px;
 }
 
-
+/*
 #table .row {
     border-bottom: solid 0.5px gray;
     padding: 10px;
@@ -29,5 +29,5 @@ input {
     border-right: solid 0.5px gray;
     padding: 10px;
 }
-
+*/
 

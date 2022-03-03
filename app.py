@@ -72,7 +72,7 @@ app.layout= html.Div(
         html.Br(),
         html.Div([html.Button('Save', id='save', n_clicks=0), html.Div(id='last-saved')]),
         html.Br(),
-        html.Hr(),
+        html.Br(),
         html.Div(id='table'),
         html.Br(),
         dcc.Store(id='properties')
@@ -142,7 +142,8 @@ def render_table(start, end, site, qcimg, score, click):
 
 
     headers= ['Subject','Session', 'Score']+ qcimg
-    rows= [dbc.Row([dbc.Col(html.Div(h)) for h in headers])]
+    head= [html.Tr([html.Th(html.Div(h)) for h in headers])]
+    body=[]
     for i,d in enumerate(dirs):
         parts= d.split('/')
         sub= parts[-4]
@@ -171,11 +172,11 @@ def render_table(start, end, site, qcimg, score, click):
         if score is not None and props[f'{sub}_{ses}']!=score:
             continue
  
-        rows.append(
-            dbc.Row(
-                [dbc.Col(html.Div(sub)), dbc.Col(html.Div(ses))]+ \
-                [dbc.Col(dcc.Dropdown(value=props[f'{sub}_{ses}'], id= {'sub_ses':f'{sub}_{ses}'}, options=[0,1,2,3,4]))]+ \
-                [dbc.Col(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
+        body.append(
+            html.Tr(
+                [html.Td(html.Div(sub)), html.Td(html.Div(ses))]+ \
+                [html.Td(dcc.Dropdown(value=props[f'{sub}_{ses}'], id= {'sub_ses':f'{sub}_{ses}'}, options=[0,1,2,3,4]))]+ \
+                [html.Td(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
             )
         )
  
@@ -183,8 +184,12 @@ def render_table(start, end, site, qcimg, score, click):
     with open(props_file,'wb') as f:
         pickle.dump(props,f)
 
-    
-    return rows,props
+    table=dbc.Table([html.Thead(head),html.Tbody(body)],
+        bordered=True,
+        hover=True)
+
+    return table,props
+
 
 
 @app.callback(Output('last-saved','children'),
