@@ -190,19 +190,14 @@ def render_table(start, end, site, qcimg, click):
 def save_data(click,scores,ids,props):
 
     changed = [p['prop_id'] for p in callback_context.triggered][0]
-    if click>0:
-        if 'save' not in changed:
-            raise PreventUpdate
+    if 'save' not in changed:
+        raise PreventUpdate
 
     print('inside save_data')
 
-    # load all scores
-    try:
-        with open(props_file,'rb') as f:
-            props_all= pickle.load(f)
-    except:
-        raise PreventUpdate
-    
+    # load all scores 
+    with open(props_file,'rb') as f:
+        props_all= pickle.load(f)
 
     # update changed scores
     for n,s in zip(ids,scores):
