@@ -142,7 +142,7 @@ def render_table(start, end, site, qcimg, score, click):
 
 
     headers= ['Subject','Session', 'Score']+ qcimg
-    rows= [dbc.Row([dbc.Col(html.Div(h)) for h in headers])]
+    rows= [html.Thead([html.Tr([html.Th(html.Div(h)) for h in headers])])]
     for i,d in enumerate(dirs):
         parts= d.split('/')
         sub= parts[-4]
@@ -172,10 +172,10 @@ def render_table(start, end, site, qcimg, score, click):
             continue
  
         rows.append(
-            dbc.Row(
-                [dbc.Col(html.Div(sub)), dbc.Col(html.Div(ses))]+ \
-                [dbc.Col(dcc.Dropdown(value=props[f'{sub}_{ses}'], id= {'sub_ses':f'{sub}_{ses}'}, options=[0,1,2,3,4]))]+ \
-                [dbc.Col(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
+            html.Tr(
+                [html.Td(html.Div(sub)), html.Td(html.Div(ses))]+ \
+                [html.Td(dcc.Dropdown(value=props[f'{sub}_{ses}'], id= {'sub_ses':f'{sub}_{ses}'}, options=[0,1,2,3,4]))]+ \
+                [html.Td(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
             )
         )
  
