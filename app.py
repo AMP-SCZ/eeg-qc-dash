@@ -46,14 +46,14 @@ app.layout= html.Div(
             # date filter
             dbc.Col(
                 html.Div([
-                    dcc.Input(id='start',placeholder='yyyy/mm/dd'),
+                    dcc.Input(id='start',placeholder='yyyy/mm/dd',debounce=True),
                     '--',
-                    dcc.Input(id='end',placeholder='yyyy/mm/dd'),
+                    dcc.Input(id='end',placeholder='yyyy/mm/dd',debounce=True),
                 ])
             ),
 
             # site filter
-            dbc.Col(html.Div(dcc.Input(id='site',placeholder='site'))),
+            dbc.Col(html.Div(dcc.Input(id='site',placeholder='site',debounce=True))),
             
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
@@ -63,7 +63,7 @@ app.layout= html.Div(
             dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',options=[1,2,3,4]))),
 
             # technician filter
-            dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician'))),
+            dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
             
             # filter button
             dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0))
