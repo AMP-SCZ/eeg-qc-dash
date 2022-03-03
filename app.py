@@ -52,13 +52,13 @@ app.layout= html.Div(
                 ])
             ),
 
-            # site filter
-            dbc.Col(html.Div(dcc.Input(id='site',placeholder='site',debounce=True))),
-            
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
                 options=suffixes, multi=True, placeholder='column(s)',
                 value=['_QCresponseAccuracy','_QCresponseTime']))),
+
+            # site filter
+            dbc.Col(html.Div(dcc.Input(id='site',placeholder='site',debounce=True))),
 
             # QC score filter
             dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
