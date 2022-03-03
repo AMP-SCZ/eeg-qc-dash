@@ -141,10 +141,11 @@ def render_table(start, end, site, qcimg, score, click):
     # filter by technician
 
 
-    headers= ['Subject','Session', 'Score']+ qcimg
+    headers= ['Index','Subject','Session','Score']+ qcimg
     head= [html.Tr([html.Th(h) for h in headers])]
     body=[]
-    for i,d in enumerate(dirs):
+    i=1
+    for d in dirs:
         parts= d.split('/')
         sub= parts[-4]
         ses= parts[-2].split('-')[1]
@@ -174,12 +175,14 @@ def render_table(start, end, site, qcimg, score, click):
  
         body.append(
             html.Tr(
-                [html.Td(sub), html.Td(ses)]+ \
+                [html.Td(i), html.Td(sub), html.Td(ses)]+ \
                 [html.Td(dcc.Dropdown(value=props[f'{sub}_{ses}'],
                     id= {'sub_ses':f'{sub}_{ses}'}, options=[0,1,2,3,4]))]+ \
                 [html.Td(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
             )
         )
+        
+        i+=1
  
 
     with open(props_file,'wb') as f:
