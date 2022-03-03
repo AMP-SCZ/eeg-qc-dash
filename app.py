@@ -11,6 +11,7 @@ from os.path import isfile, isdir, abspath, join as pjoin, dirname, splitext, ba
 from os import makedirs, getenv, remove, listdir
 
 import re
+from datetime import datetime
 import pandas as pd
 import numpy as np
 import logging
@@ -69,9 +70,7 @@ app.layout= html.Div(
         ]),
         
         html.Br(),
-        html.Button('Save', id='save'),
-        html.Div(id='last-save'),
-
+        html.Div([html.Button('Save', id='save', n_clicks=0), html.Div(id='last-saved')]),
         html.Br(),
         html.Hr(),
         html.Div(id='table'),
@@ -121,19 +120,25 @@ def render_table(start, end, site, qcimg, click):
 
 
     # filter by QC score
-
-
+    # initialize scores
+    if not isfile('.scores.csv'):
+        df= pd.DataFrame(columns=['sub','ses','score'])
+    else:
+        df= pd.read_csv('.scores.csv')
     # filter by technician
 
 
-    headers= ['Subject','Session']+ qcimg
+    headers= ['Subject','Session', 'Score']+ qcimg
     rows= [dbc.Row([dbc.Col(html.Div(h)) for h in headers])]
     for i,d in enumerate(dirs):
         parts= d.split('/')
         sub= parts[-4]
         ses= parts[-2].split('-')[1]
         imgs= glob(f'{d}/*[!QC].png')
- 
+       
+        # initialize scores 
+        if not isfile('.scores.csv'):
+            df.loc[i]= [sub, ses, 4]
 
         # filter by columns
         if qcimg:
@@ -150,6 +155,7 @@ def render_table(start, end, site, qcimg, click):
         rows.append(
             dbc.Row(
                 [dbc.Col(html.Div(sub)), dbc.Col(html.Div(ses))]+ \
+                [dbc.Col(dcc.Dropdown(value=df.loc[i]['score'], options=[1,2,3,4]))]+ \
                 [dbc.Col(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
             )
         )
@@ -161,8 +167,15 @@ def render_table(start, end, site, qcimg, click):
     return rows
 
 
+@app.callback(Output('last-saved','children'),Input('save','n_clicks'))
+def save_data(click):
+    if click>0:
+        # read all sub, ses, score dropdown
+        # save them in .scores.csv
+        # populate status in last-save
+        pass
 
-
+    return 'Last saved on '+ datetime.now().ctime()
 
 if __name__=='__main__':
     app.run_server(debug=True, host='localhost')
