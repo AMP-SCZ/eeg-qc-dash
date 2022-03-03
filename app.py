@@ -10,7 +10,7 @@ import dash_bootstrap_components as dbc
 from os.path import isfile, isdir, abspath, join as pjoin, dirname, splitext, basename
 from os import makedirs, getenv, remove, listdir
 
-import re
+import re, pickle
 from datetime import datetime
 import pandas as pd
 import numpy as np
@@ -81,6 +81,8 @@ app.layout= html.Div(
 )
 
 
+props_file= '.scores.pkl'
+
 
 @app.callback([Output('table','children'),
     Output('properties','data')],
@@ -95,7 +97,9 @@ def render_table(start, end, site, qcimg, click):
         if 'global-filter' not in changed:
             raise PreventUpdate
 
-
+    print('inside render_table')
+   
+ 
     dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
 
 
@@ -121,16 +125,20 @@ def render_table(start, end, site, qcimg, click):
         dirs= [d for d in dirs if site in d]
 
 
+    # TODO 
     # filter by QC score
 
-    if not isfile('.scores.csv'):
+
+    if not isfile(props_file):
         # initialize scores
-        df= pd.DataFrame(columns=['sub','ses','score'])
         props={}
     else:
         # load scores
-        df= pd.read_csv('.scores.csv')
+        with open(props_file,'rb') as f:
+            props= pickle.load(f)
 
+
+    # TODO 
     # filter by technician
 
 
@@ -143,8 +151,7 @@ def render_table(start, end, site, qcimg, click):
         imgs= glob(f'{d}/*[!QC].png')
        
         # initialize scores 
-        if not isfile('.scores.csv'):
-            # df.loc[i]= [sub, ses, 0]
+        if not isfile(props_file):
             props[f'{sub}_{ses}']=0
 
         # filter by columns
@@ -162,14 +169,14 @@ def render_table(start, end, site, qcimg, click):
         rows.append(
             dbc.Row(
                 [dbc.Col(html.Div(sub)), dbc.Col(html.Div(ses))]+ \
-                # [dbc.Col(dcc.Dropdown(value=df.loc[i]['score'], id= {'sub':sub,'ses':ses}, options=[1,2,3,4]))]+ \
                 [dbc.Col(dcc.Dropdown(value=props[f'{sub}_{ses}'], id= {'sub_ses':f'{sub}_{ses}'}, options=[0,1,2,3,4]))]+ \
                 [dbc.Col(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
             )
         )
  
 
-    # callback for save and last-save
+    with open(props_file,'wb') as f:
+        pickle.dump(props,f)
 
     
     return rows,props
@@ -181,25 +188,34 @@ def render_table(start, end, site, qcimg, click):
     Input({'sub_ses':ALL},'id'),
     Input('properties','data')])
 def save_data(click,scores,ids,props):
+
+    changed = [p['prop_id'] for p in callback_context.triggered][0]
     if click>0:
-        # read all sub, ses, score dropdown
-        # save them in .scores.csv
-        # populate status in last-save
-        pass
-        
-        # print(props)
- 
-        for n,s in zip(ids,scores):
-            print(n,s)
-            props[n['sub_ses']]=s
+        if 'save' not in changed:
+            raise PreventUpdate
 
-        # save props.npy
-        
-        # return 'Last saved on '+ datetime.now().ctime()
+    print('inside save_data')
+
+    # load all scores
+    try:
+        with open(props_file,'rb') as f:
+            props_all= pickle.load(f)
+    except:
+        raise PreventUpdate
     
-        print(props) 
 
-    raise PreventUpdate
+    # update changed scores
+    for n,s in zip(ids,scores):
+        props[n['sub_ses']]=s
+
+    print(props)
+
+    # save all scores
+    with open(props_file,'wb') as f:
+        pickle.dump(props,f)
+  
+
+    return 'Last saved on '+ datetime.now().ctime()
 
 
 if __name__=='__main__':
