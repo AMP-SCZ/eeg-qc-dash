@@ -173,16 +173,17 @@ def render_table(start, end, site, qcimg, click):
 
 @app.callback(Output('last-saved','children'),
     [Input('save','n_clicks'),
-    Input({'sub_ses':ALL},'value')])
-def save_data(click,scores):
+    Input({'sub_ses':ALL},'value'),
+    Input({'sub_ses':ALL},'id')])
+def save_data(click,scores,ids):
     if click>0:
         # read all sub, ses, score dropdown
         # save them in .scores.csv
         # populate status in last-save
         pass
         
-        for s in scores:
-            print(s)
+        for sub_ses,s in zip(ids,scores):
+            print(sub_ses,s)
         
         # return 'Last saved on '+ datetime.now().ctime()
     
