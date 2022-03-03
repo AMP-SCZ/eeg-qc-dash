@@ -2,7 +2,7 @@
 
 import base64, io
 import dash
-from dash import dcc, html, dash_table, Dash, callback_context
+from dash import dcc, html, dash_table, Dash, callback_context, MATCH, ALL
 from dash.dependencies import Input, Output
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
@@ -120,11 +120,14 @@ def render_table(start, end, site, qcimg, click):
 
 
     # filter by QC score
-    # initialize scores
+
     if not isfile('.scores.csv'):
+        # initialize scores
         df= pd.DataFrame(columns=['sub','ses','score'])
     else:
+        # load scores
         df= pd.read_csv('.scores.csv')
+
     # filter by technician
 
 
@@ -155,7 +158,8 @@ def render_table(start, end, site, qcimg, click):
         rows.append(
             dbc.Row(
                 [dbc.Col(html.Div(sub)), dbc.Col(html.Div(ses))]+ \
-                [dbc.Col(dcc.Dropdown(value=df.loc[i]['score'], options=[1,2,3,4]))]+ \
+                # [dbc.Col(dcc.Dropdown(value=df.loc[i]['score'], id= {'sub':sub,'ses':ses}, options=[1,2,3,4]))]+ \
+                [dbc.Col(dcc.Dropdown(value=df.loc[i]['score'], id= {'sub_ses':f'{sub}_{ses}'}, options=[1,2,3,4]))]+ \
                 [dbc.Col(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
             )
         )
@@ -167,15 +171,24 @@ def render_table(start, end, site, qcimg, click):
     return rows
 
 
-@app.callback(Output('last-saved','children'),Input('save','n_clicks'))
-def save_data(click):
+@app.callback(Output('last-saved','children'),
+    [Input('save','n_clicks'),
+    Input({'sub_ses':ALL},'value')])
+def save_data(click,scores):
     if click>0:
         # read all sub, ses, score dropdown
         # save them in .scores.csv
         # populate status in last-save
         pass
+        
+        for s in scores:
+            print(s)
+        
+        # return 'Last saved on '+ datetime.now().ctime()
+    
+    print(callback_context.states_list)
 
-    return 'Last saved on '+ datetime.now().ctime()
+    raise PreventUpdate
 
 if __name__=='__main__':
     app.run_server(debug=True, host='localhost')
