@@ -36,7 +36,15 @@ suffixes= "_QCimpedance, _QClineNoise, _QCcounts, _QCresponseAccuracy, _QCrespon
 
 app.layout= html.Div(
     children= [
-        html.H3('EEG Quality Checking Tool'),
+        dbc.Row([
+            dbc.Col(html.Img(src='https://avatars.githubusercontent.com/u/75388309?s=400&u=0d32212fdb2b3bf3854ed6624ce9f011ca6de29c&v=4', id='ampscz'),width=2),
+            dbc.Col(dcc.Markdown("""
+### EEG Quality Checking Tool
+Developed by Tashrif Billah, Sylvain Bouix, Spero Nicholas, Daniel Mathalon, and Gregory Light
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.6326486.svg)]
+(https://doi.org/10.5281/zenodo.6326486)
+            """)),
+        ]),
         html.Hr(),
         'Provide values for filtering:',
         html.Br(),
