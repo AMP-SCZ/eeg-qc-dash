@@ -23,12 +23,13 @@ SCRIPTDIR=dirname(abspath(__file__))
 
 # initial list of Figures
 ROOTDIR= getenv("EEG_QC_PHOENIX")
+URL_PREFIX= getenv("DASH_URL_BASE_PATHNAME",'')
 if not ROOTDIR:
     print('Define env var EEG_QC_PHOENIX and try again')
     exit(1)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP,'styles.css']
-app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG Qc Tool', assets_folder=ROOTDIR, assets_url_path="/")
+app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG QC', assets_folder=ROOTDIR, assets_url_path="/")
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
@@ -217,7 +218,7 @@ def render_table(start, end, site, qcimg, score, click):
                 [html.Td(i), html.Td(sub), html.Td(ses)]+ \
                 [html.Td(dcc.Dropdown(value=props[f'{sub}_{ses}'],
                     id= {'sub_ses':f'{sub}_{ses}'}, options=[0,1,2,3,4]))]+ \
-                [html.Td(html.Img(src=img.replace(ROOTDIR,''))) for img in imgs]
+                [html.Td(html.Img(src=img.replace(ROOTDIR,URL_PREFIX))) for img in imgs]
             )
         )
         
