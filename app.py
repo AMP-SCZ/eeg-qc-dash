@@ -49,8 +49,9 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 * Provide value in the box(es) and click `FILTER`
 * Click `SAVE` to save your QC scores
 * Enter date as `yyyy/mm/dd`
-* Example of `site`: LA, PA, Avg
+* Example of `site`: LA, PA, avg
 * Score 0 indicates not yet checked
+* Refresh browser to reset all filters
             """)),
         ]),
         html.Hr(),
@@ -129,8 +130,9 @@ def render_table(start, end, site, qcimg, score, click):
         pass
     elif (start or end or site or qcimg or score) and ('global-filter' not in changed):
         raise PreventUpdate
+    elif not qcimg:
+        raise PreventUpdate
 
-    
     print('executing render_table')
     
     dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
