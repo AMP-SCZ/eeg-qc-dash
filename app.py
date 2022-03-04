@@ -62,34 +62,42 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                     dcc.Input(id='start',placeholder='yyyy/mm/dd',debounce=True),
                     '--',
                     dcc.Input(id='end',placeholder='yyyy/mm/dd',debounce=True),
-                ])
+                ]),
+                width='auto'
             ),
 
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
                 options=suffixes, multi=True, placeholder='column(s)',
-                value=['_QCresponseAccuracy','_QCresponseTime']))),
+                value=['_QCresponseAccuracy','_QCresponseTime'])),
+                width=3
+            ),
 
             # site filter
-            dbc.Col(html.Div(dcc.Input(id='site',placeholder='site',debounce=True))),
+            dbc.Col(html.Div(dcc.Input(id='site',placeholder='site',debounce=True)),
+                width='auto'
+            ),
 
             # QC score filter
             dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
-                options=[0,1,2,3,4]))),
+                options=[0,1,2,3,4]))
+            ),
 
             # technician filter
             dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
             
-            # filter button
-            dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0))
         ]),
         
         dcc.Loading(html.Div(id='loading'),type='cube'),
+        html.Br(),
         
+        dbc.Row([
+            # filter button
+            dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0)),
+            dbc.Col([html.Button('Save', id='save', n_clicks=0), html.Div(id='last-saved')]),
+        ]),
         html.Br(),
-        html.Div([html.Button('Save', id='save', n_clicks=0), html.Div(id='last-saved')]),
         html.Br(),
-        # html.Br(),
 
         html.Div(id='table'),
         html.Br(),
