@@ -38,21 +38,28 @@ app.layout= html.Div(
     children= [
         dbc.Row([
             dbc.Col(html.Img(src='https://avatars.githubusercontent.com/u/75388309?s=400&u=0d32212fdb2b3bf3854ed6624ce9f011ca6de29c&v=4', id='ampscz'),width=2),
-            dbc.Col(dcc.Markdown("""
+            dbc.Col([
+                dbc.Row(dcc.Markdown("""
 ### EEG Quality Checking Tool
 Developed by Tashrif Billah, Sylvain Bouix, Spero Nicholas, Daniel Mathalon, and Gregory Light
 
 https://github.com/AMP-SCZ/eeg-qc-dash
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.6326486.svg)]
 (https://doi.org/10.5281/zenodo.6326486)
-
+            """)),
+                dbc.Row([
+                    dbc.Col(dcc.Markdown("""
 * Provide value in the box(es) and click `FILTER`
 * Click `SAVE` to save your QC scores
 * Enter date as `yyyy/mm/dd`
+                """),width='auto'),
+                    dbc.Col(dcc.Markdown("""
 * Example of `site`: LA, PA, avg
 * Score 0 indicates not yet checked
 * Refresh browser to reset all filters
-            """)),
+                """),width='auto')
+                ])
+            ])
         ]),
         html.Hr(),
         html.Br(),
