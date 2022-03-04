@@ -4,6 +4,13 @@ body {
     // font-weight: bold;
 }
 
+#ampscz {
+    height: 120px;
+    width: 120px;
+    
+}
+
+
 input#start {
     margin-right: 10px;
 }
@@ -15,19 +22,4 @@ input#end {
 input {
     width: 90px;
 }
-
-.ddown {
-    width: 200px;
-}
-
-/*
-#table .row {
-    border-bottom: solid 0.5px gray;
-    padding: 10px;
-}
-#table .col {
-    border-right: solid 0.5px gray;
-    padding: 10px;
-}
-*/
 
