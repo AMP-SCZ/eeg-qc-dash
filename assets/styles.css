@@ -23,3 +23,10 @@ input {
     width: 90px;
 }
 
+#global-filter {
+    background: yellow;
+}
+
+#save {
+    background: lightgreen;
+}
