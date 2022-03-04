@@ -46,8 +46,10 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.6326486.svg)]
 (https://doi.org/10.5281/zenodo.6326486)
 
-* Provide value(s) in the boxes and click `FILTER`
+* Provide value in the box(es) and click `FILTER`
 * Click `SAVE` to save your QC scores
+* Enter date as `yyyy/mm/dd`
+* Example of `site`: LA, PA, Avg
             """)),
         ]),
         html.Hr(),
