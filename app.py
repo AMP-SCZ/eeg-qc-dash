@@ -50,6 +50,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 * Click `SAVE` to save your QC scores
 * Enter date as `yyyy/mm/dd`
 * Example of `site`: LA, PA, Avg
+* Score 0 indicates not yet checked
             """)),
         ]),
         html.Hr(),
