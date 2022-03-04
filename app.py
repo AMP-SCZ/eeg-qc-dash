@@ -45,11 +45,12 @@ Developed by Tashrif Billah, Sylvain Bouix, Spero Nicholas, Daniel Mathalon, and
 https://github.com/AMP-SCZ/eeg-qc-dash
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.6326486.svg)]
 (https://doi.org/10.5281/zenodo.6326486)
+
+* Provide value(s) in the boxes and click `FILTER`
+* Click `SAVE` to save your QC scores
             """)),
         ]),
         html.Hr(),
-        'Provide values for filtering:',
-        html.Br(),
         html.Br(),
 
         dbc.Row([
@@ -86,7 +87,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
         html.Br(),
         html.Div([html.Button('Save', id='save', n_clicks=0), html.Div(id='last-saved')]),
         html.Br(),
-        html.Br(),
+        # html.Br(),
 
         html.Div(id='table'),
         html.Br(),
@@ -110,7 +111,7 @@ props_file= '.scores.pkl'
     Input('score','value'),
     Input('global-filter', 'n_clicks')])
 def render_table(start, end, site, qcimg, score, click):
-
+    
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     # trigger initial callback but condition future callbacks
     if changed=='.':
@@ -159,7 +160,7 @@ def render_table(start, end, site, qcimg, score, click):
     # filter by technician
 
 
-    headers= ['Index','Subject','Session','Score']+ qcimg
+    headers= ['Index','Subject','Session','QC Score']+ qcimg
     head= [html.Tr([html.Th(h) for h in headers])]
     body=[]
     i=1
