@@ -33,12 +33,23 @@ app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callbac
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-suffixes= ['_QCcounts',
- '_QCimpedance',
- '_QClineNoise',
- '_QCresponseAccuracy',
- '_QCresponseTime',
- '_QCrestAlpha']
+suffixes= [
+    '_QCcounts',
+    '_QCimpedance',
+    '_QClineNoise',
+    '_QCresponseAccuracy',
+    '_QCresponseTime',
+    '_QCrestAlpha'
+]
+
+
+score_options=[
+    {'label':'-9 | Unchecked','value':-9},
+    {'label':'1 | Poor','value':1},
+    {'label':'2 | Average','value':2},
+    {'label':'3 | Good','value':3},
+    {'label':'4 | Excellent','value':4}
+]
 
 
 app.layout= html.Div(
@@ -97,7 +108,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
             # QC score filter
             dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
-                options=[0,1,2,3,4]))
+                options=score_options))
             ),
 
             # technician filter
@@ -200,7 +211,7 @@ def render_table(start, end, site, qcimg, score, click):
        
         # initialize scores 
         if not isfile(props_file):
-            props[f'{sub}_{ses}']=0
+            props[f'{sub}_{ses}']=-9
 
         # filter by columns
         if qcimg:
@@ -226,7 +237,8 @@ def render_table(start, end, site, qcimg, score, click):
             html.Tr(
                 [html.Td(i), html.Td(sub), html.Td(ses)]+ \
                 [html.Td(dcc.Dropdown(value=props[f'{sub}_{ses}'],
-                    id= {'sub_ses':f'{sub}_{ses}'}, options=[0,1,2,3,4]))]+ \
+                    id= {'sub_ses':f'{sub}_{ses}'},
+                    options=[d['value'] for d in score_options]))]+ \
                 [html.Td(html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
                     width='100%',height='auto')) for img in imgs]
             )
