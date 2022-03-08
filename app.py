@@ -33,7 +33,13 @@ app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callbac
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-suffixes= "_QCimpedance, _QClineNoise, _QCcounts, _QCresponseAccuracy, _QCresponseTime, _QCrestAlpha".split(', ')
+suffixes= ['_QCcounts',
+ '_QCimpedance',
+ '_QClineNoise',
+ '_QCresponseAccuracy',
+ '_QCresponseTime',
+ '_QCrestAlpha']
+
 
 app.layout= html.Div(
     children= [
@@ -79,7 +85,8 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
                 options=suffixes, multi=True, placeholder='column(s)',
-                value=['_QCresponseAccuracy','_QCresponseTime'])),
+                value=['_QCresponseAccuracy','_QCresponseTime','_QCrestAlpha'])),
+                # value=suffixes)),
                 width=3
             ),
 
@@ -202,9 +209,11 @@ def render_table(start, end, site, qcimg, score, click):
                 for q in qcimg:
                     if img.endswith(f'{q}.png'):
                         imgs2.append(img)
+                        break
 
             imgs= imgs2.copy()
  
+        imgs= sorted(imgs)
         # print(imgs)
         
         # filter by QC score
