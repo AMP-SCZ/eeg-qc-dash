@@ -218,7 +218,8 @@ def render_table(start, end, site, qcimg, score, click):
                 [html.Td(i), html.Td(sub), html.Td(ses)]+ \
                 [html.Td(dcc.Dropdown(value=props[f'{sub}_{ses}'],
                     id= {'sub_ses':f'{sub}_{ses}'}, options=[0,1,2,3,4]))]+ \
-                [html.Td(html.Img(src=img.replace(ROOTDIR,URL_PREFIX))) for img in imgs]
+                [html.Td(html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
+                    width='100%',height='auto')) for img in imgs]
             )
         )
         
