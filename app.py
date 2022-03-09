@@ -238,12 +238,12 @@ def render_table(start, end, site, qcimg, score, click):
                 [html.Td(i), html.Td(sub), html.Td(ses)]+ \
                 [html.Td([dcc.Dropdown(value=props[f'{sub}_{ses}'],
                     id= {'sub_ses':f'{sub}_{ses}'},
-                    options=[d['value'] for d in score_options]),
-                    dcc.Input(id= {'sub_ses-1':f'{sub}_{ses}'},
-                        placeholder='comment',debounce=True,
-                        style={'width':'100%'},
-                        size='50',
-                    )])]+ \
+                    # options=[d['value'] for d in score_options]),
+                    options= score_options),
+                    html.Textarea(id= {'sub_ses-1':f'{sub}_{ses}'},
+                        placeholder='comment',
+                        rows=30,cols=20)
+                    ])]+ \
                 [html.Td(html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
                     width='100%',height='auto')) for img in imgs]
             )
