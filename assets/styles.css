@@ -30,3 +30,9 @@ input {
 #save {
     background: lightgreen;
 }
+
+img {
+    max-width: 300px;
+}
+
+
