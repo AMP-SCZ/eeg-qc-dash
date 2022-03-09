@@ -210,7 +210,7 @@ def render_table(start, end, site, qcimg, score, click):
         imgs= glob(f'{d}/*[!QC].png')
        
         # initialize scores 
-        if not isfile(props_file):
+        if f'{sub}_{ses}' not in props:
             props[f'{sub}_{ses}']=-9
 
         # filter by columns
