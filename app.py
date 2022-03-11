@@ -294,7 +294,7 @@ def save_data(click,scores,comments,ids,props):
         props[sub_ses]=s
         props[sub_ses+'-1']=c
 
-    print(props)
+    # print(props)
 
     # save all scores
     with open(props_file,'wb') as f:
