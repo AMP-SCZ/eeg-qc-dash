@@ -207,11 +207,15 @@ def render_table(start, end, site, qcimg, score, click):
         parts= d.split('/')
         sub= parts[-4]
         ses= parts[-2].split('-')[1]
+        sub_ses= f'{sub}_{ses}'
         imgs= glob(f'{d}/*[!QC].png')
        
         # initialize scores 
         if f'{sub}_{ses}' not in props:
-            props[f'{sub}_{ses}']=-9
+            # score
+            props[sub_ses]=-9
+            # comment
+            props[sub_ses+'-1']=''
 
         # filter by columns
         if qcimg:
@@ -236,11 +240,12 @@ def render_table(start, end, site, qcimg, score, click):
         body.append(
             html.Tr(
                 [html.Td(i), html.Td(sub), html.Td(ses)]+ \
-                [html.Td([dcc.Dropdown(value=props[f'{sub}_{ses}'],
-                    id= {'sub_ses':f'{sub}_{ses}'},
-                    # options=[d['value'] for d in score_options]),
-                    options= score_options),
-                    html.Textarea(id= {'sub_ses-1':f'{sub}_{ses}'},
+                [html.Td([
+                    dcc.Dropdown(value=props[sub_ses],
+                        id= {'sub_ses':sub_ses},
+                        options= score_options),
+                    dcc.Textarea(value=props[sub_ses+'-1'],
+                        id= {'sub_ses-1':sub_ses},
                         placeholder='comment',
                         rows=30,cols=20)
                     ])]+ \
@@ -266,25 +271,30 @@ def render_table(start, end, site, qcimg, score, click):
 @app.callback(Output('last-saved','children'),
     [Input('save','n_clicks'),
     Input({'sub_ses':ALL},'value'),
+    Input({'sub_ses-1':ALL},'value'),
     Input({'sub_ses':ALL},'id'),
     Input('properties','data')])
-def save_data(click,scores,ids,props):
+def save_data(click,scores,comments,ids,props):
 
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     if 'save' not in changed:
         raise PreventUpdate
 
     print('executing save_data')
-
+    
+    # even after filtering, props contain all scores
+    # so loading of all scores from file is not required
     # load all scores 
-    with open(props_file,'rb') as f:
-        props_all= pickle.load(f)
-
+    # with open(props_file,'rb') as f:
+    #     props_all= pickle.load(f)
+    
     # update changed scores
-    for n,s in zip(ids,scores):
-        props[n['sub_ses']]=s
+    for n,s,c in zip(ids,scores,comments):
+        sub_ses= n['sub_ses']
+        props[sub_ses]=s
+        props[sub_ses+'-1']=c
 
-    # print(props)
+    print(props)
 
     # save all scores
     with open(props_file,'wb') as f:
