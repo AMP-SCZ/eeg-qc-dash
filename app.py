@@ -53,36 +53,6 @@ score_options=[
 
 
 
-# sticky-top table
-headers= ['Index','Subject','Session','QC Score']+ \
-    ['_QCresponseAccuracy','_QCresponseTime','_QCrestAlpha']
-head= [html.Tr([html.Th(h) for h in headers])]
-body=[]
-
-sub='GRANDavg'
-ses='00000000'
-sub_ses=f'{sub}_{ses}'
-d='/data/predict/kcho/flow_test/spero/Pronet/PHOENIX/PROTECTED/PredictGRAND/processed/GRANDavg/eeg/ses-00000000/Figures'
-imgs= sorted(glob(f'{d}/*[!QC].png'))
-body.append(
-    html.Tr(
-        [html.Td('1'), html.Td(sub), html.Td(ses)]+ \
-        [html.Td([
-            dcc.Textarea(id= {'sub_ses-1':sub_ses},
-                placeholder='comment',
-                rows=30,cols=20)
-            ])]+ \
-        [html.Td(html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
-            width='100%',height='auto')) for img in imgs[3:]]
-    )
-)
-
-table_sticky=dbc.Table([html.Thead(head),html.Tbody(body)],
-    bordered=True,
-    hover=True)
-
-
-
 app.layout= html.Div(
     children= [
         dbc.Row([
@@ -159,9 +129,9 @@ https://github.com/AMP-SCZ/eeg-qc-dash
         html.Br(),
         html.Br(),
 
-        dbc.Navbar(html.Div(table_sticky),
+        dbc.Navbar(html.Div(id='avg-table'),
             sticky='top',
-            id='sticky-top'
+            # id='sticky-top'
         ),
 
         html.Br(),
@@ -169,7 +139,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
         html.Div(id='table'),
         html.Br(),
-        
+
         dcc.Store(id='properties')
 
     ]
@@ -342,6 +312,107 @@ def save_data(click,scores,comments,ids,props):
   
 
     return 'Last saved on '+ datetime.now().ctime()
+
+
+
+@app.callback(Output('avg-table','children'),
+    # Output('properties','data'),
+    [Input('site','value'),
+    Input('qcimg','value'),
+    Input('global-filter', 'n_clicks')])
+def render_avg_table(site, qcimg, click):
+
+    changed = [p['prop_id'] for p in callback_context.triggered][0]
+    # trigger initial callback but condition future callbacks
+    if changed=='.':
+        pass
+    elif (site or qcimg) and ('global-filter' not in changed):
+        raise PreventUpdate
+    elif not qcimg:
+        raise PreventUpdate
+    
+    # if we do not glob, finding dirs would be difficult
+    # because of Pronet/Prescient ramification
+    dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
+
+    # we need only these rows, so filter now to preserve order
+    subjects=['GRANDavg']
+    if site:
+        subjects.append(f'{site}avg')
+
+    dirs2=[]
+    for s in subjects:
+        for d in dirs:
+            if s in d:
+                dirs2.append(d)
+                break
+    
+    dirs= dirs2.copy()
+    
+    # print(dirs)
+
+    # sticky-top table
+    qcimg= sorted(qcimg)
+    headers= ['Index','Subject','Session','QC Score']+ qcimg
+    head= [html.Tr([html.Th(h) for h in headers])]
+    body=[]
+    i=1
+    for d in dirs:
+        parts= d.split('/')
+        sub= parts[-4]
+        ses= parts[-2].split('-')[1]
+        sub_ses= f'{sub}_{ses}'
+        imgs= glob(f'{d}/*[!QC].png')
+        
+
+        '''
+        # initialize scores
+        if f'{sub}_{ses}' not in props:
+            # score
+            props[sub_ses]=-9
+            # comment
+            props[sub_ses+'-1']=''
+        '''
+
+        # filter by columns
+        if qcimg:
+            imgs2=[]
+            for img in imgs:
+                for q in qcimg:
+                    if img.endswith(f'{q}.png'):
+                        imgs2.append(img)
+                        break
+
+            imgs= imgs2.copy()
+
+        imgs= sorted(imgs)
+        
+        # print(imgs)
+
+        body.append(
+            html.Tr(
+                [html.Td(i), html.Td(sub), html.Td(ses)]+ \
+                [html.Td([
+                    dcc.Textarea(id= {'sub_ses-1':sub_ses},
+                        placeholder='comment',
+                        rows=30,cols=20)
+                    ])]+ \
+                [html.Td(html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
+                    width='100%',height='auto')) for img in imgs]
+            )
+        )
+
+        i+=1
+
+
+
+    table=dbc.Table([html.Thead(head),html.Tbody(body)],
+        bordered=True,
+        hover=True)
+
+
+    return table
+    
 
 
 if __name__=='__main__':
