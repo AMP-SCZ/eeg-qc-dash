@@ -35,4 +35,17 @@ img {
     max-width: 300px;
 }
 
+#avg-table {
+    border: solid red;
+    /*
+     dcc.Navbar overrides html.Div
+     the former appears to fit-content
+     while the latter appears to use all available
+     width: -webkit-fill-available;
+     width: -moz-available
+     To circumvent this issue, set width: 100%;
+    */
+    width: 100%;
 
+    // background: white;
+}
