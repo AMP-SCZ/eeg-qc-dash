@@ -131,6 +131,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
         dbc.Navbar(html.Div(id='avg-table'),
             sticky='top',
+            color='white'
         ),
         # html.Div(id='avg-table'),
 
