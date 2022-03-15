@@ -393,7 +393,13 @@ def render_avg_table(site, qcimg, click):
             html.Tr(
                 [html.Td(i), html.Td(sub), html.Td(ses)]+ \
                 [html.Td([
-                    dcc.Textarea(id= {'sub_ses-1':sub_ses},
+                    dcc.Dropdown(
+                        # value=props[sub_ses],
+                        id= {'sub_ses':sub_ses},
+                        options= score_options),
+                    dcc.Textarea(
+                        # value=props[sub_ses+'-1'],
+                        id= {'sub_ses-1':sub_ses},
                         placeholder='comment',
                         rows=30,cols=20)
                     ])]+ \
