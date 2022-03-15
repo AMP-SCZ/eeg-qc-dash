@@ -140,7 +140,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             # QC score filter
             dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
                 options=score_options)),
-                width=1
+                width=2
             ),
 
             # technician filter
