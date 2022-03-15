@@ -215,6 +215,11 @@ def render_table(start, end, site, qcimg, score, click):
     body=[]
     i=1
     for d in dirs:
+        
+        # do not show averages in main table
+        if 'avg' in d:
+            continue
+
         parts= d.split('/')
         sub= parts[-4]
         ses= parts[-2].split('-')[1]
