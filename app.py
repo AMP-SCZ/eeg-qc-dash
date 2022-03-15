@@ -52,6 +52,37 @@ score_options=[
 ]
 
 
+
+# sticky-top table
+headers= ['Index','Subject','Session','QC Score']+ \
+    ['_QCresponseAccuracy','_QCresponseTime','_QCrestAlpha']
+head= [html.Tr([html.Th(h) for h in headers])]
+body=[]
+
+sub='GRANDavg'
+ses='00000000'
+sub_ses=f'{sub}_{ses}'
+d='/data/predict/kcho/flow_test/spero/Pronet/PHOENIX/PROTECTED/PredictGRAND/processed/GRANDavg/eeg/ses-00000000/Figures'
+imgs= sorted(glob(f'{d}/*[!QC].png'))
+body.append(
+    html.Tr(
+        [html.Td('1'), html.Td(sub), html.Td(ses)]+ \
+        [html.Td([
+            dcc.Textarea(id= {'sub_ses-1':sub_ses},
+                placeholder='comment',
+                rows=30,cols=20)
+            ])]+ \
+        [html.Td(html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
+            width='100%',height='auto')) for img in imgs[3:]]
+    )
+)
+
+table_sticky=dbc.Table([html.Thead(head),html.Tbody(body)],
+    bordered=True,
+    hover=True)
+
+
+
 app.layout= html.Div(
     children= [
         dbc.Row([
@@ -125,6 +156,14 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0)),
             dbc.Col([html.Button('Save', id='save', n_clicks=0), html.Div(id='last-saved')]),
         ]),
+        html.Br(),
+        html.Br(),
+
+        dbc.Navbar(html.Div(table_sticky),
+            sticky='top',
+            id='sticky-top'
+        ),
+
         html.Br(),
         html.Br(),
 
