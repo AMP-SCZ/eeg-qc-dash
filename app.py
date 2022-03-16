@@ -216,10 +216,6 @@ def render_table(start, end, site, qcimg, score, click):
     i=1
     for d in dirs:
         
-        # do not show averages in main table
-        if 'avg' in d:
-            continue
-
         parts= d.split('/')
         sub= parts[-4]
         ses= parts[-2].split('-')[1]
@@ -232,6 +228,12 @@ def render_table(start, end, site, qcimg, score, click):
             props[sub_ses]=-9
             # comment
             props[sub_ses+'-1']=''
+
+        # do not show averages in main table
+        # this check is placed here to allow
+        # initialization of all scores in the above block
+        if 'avg' in d:
+            continue
 
         # filter by columns
         if qcimg:
@@ -328,6 +330,14 @@ def save_data(click,scores,comments,ids,props):
     Input('global-filter', 'n_clicks')])
 def render_avg_table(site, qcimg, click):
 
+    if not isfile(props_file):
+        raise PreventUpdate
+    else:
+        # load scores
+        with open(props_file,'rb') as f:
+            props= pickle.load(f)
+
+
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     # trigger initial callback but condition future callbacks
     if changed=='.':
@@ -400,11 +410,11 @@ def render_avg_table(site, qcimg, click):
                 [html.Td(i), html.Td(sub), html.Td(ses)]+ \
                 [html.Td([
                     dcc.Dropdown(
-                        # value=props[sub_ses],
+                        value=props[sub_ses],
                         id= {'sub_ses':sub_ses},
                         options= score_options),
                     dcc.Textarea(
-                        # value=props[sub_ses+'-1'],
+                        value=props[sub_ses+'-1'],
                         id= {'sub_ses-1':sub_ses},
                         placeholder='comment',
                         rows=30,cols=20)
