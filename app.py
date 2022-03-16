@@ -330,14 +330,6 @@ def save_data(click,scores,comments,ids,props):
     Input('global-filter', 'n_clicks')])
 def render_avg_table(site, qcimg, click):
 
-    if not isfile(props_file):
-        raise PreventUpdate
-    else:
-        # load scores
-        with open(props_file,'rb') as f:
-            props= pickle.load(f)
-
-
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     # trigger initial callback but condition future callbacks
     if changed=='.':
@@ -367,6 +359,15 @@ def render_avg_table(site, qcimg, click):
     
     # print(dirs)
 
+    if not isfile(props_file):
+        # initialize scores
+        props={}
+    else:
+        # load scores
+        with open(props_file,'rb') as f:
+            props= pickle.load(f)
+
+
     # sticky-top table
     qcimg= sorted(qcimg)
     headers= ['Index','Subject','Session','QC Score']+ qcimg
@@ -380,16 +381,13 @@ def render_avg_table(site, qcimg, click):
         sub_ses= f'{sub}_{ses}'
         imgs= glob(f'{d}/*[!QC].png')
         
-
-        '''
         # initialize scores
         if f'{sub}_{ses}' not in props:
             # score
             props[sub_ses]=-9
             # comment
             props[sub_ses+'-1']=''
-        '''
-
+        
         # filter by columns
         if qcimg:
             imgs2=[]
