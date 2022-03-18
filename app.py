@@ -82,7 +82,14 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 ])
             ])
         ])], open=True),
-        html.Hr(),
+        # html.Hr(),
+        html.Br(),
+
+        dbc.Navbar(html.Div(id='avg-table'),
+            sticky='top',
+            color='white'
+        ),
+        
         html.Br(),
 
         dbc.Row([
@@ -123,16 +130,13 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             
         ]),
         
+        html.Br(),
         dcc.Loading(html.Div(id='loading'),type='cube'),
         html.Br(),
 
-        dbc.Navbar(html.Div(id='avg-table'),
-            sticky='top',
-            color='white'
-        ),
 
-        html.Br(),
-        html.Br(),
+        # html.Br(),
+        # html.Br(),
 
         html.Div(id='table'),
         html.Br(),
@@ -346,7 +350,7 @@ def render_avg_table(site, qcimg, click):
     dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
 
     # we need only these rows, so filter now to preserve order
-    subjects=['GRANDavg']
+    subjects=['GRANavg']
     if site:
         subjects.append(f'{site}avg')
 
