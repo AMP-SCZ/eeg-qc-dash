@@ -76,7 +76,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 """),width='auto'),
                     dbc.Col(dcc.Markdown("""
 * Example of `site`: LA, PA, avg
-* Score 0 indicates not yet checked
+* Score -9 indicates not yet checked
 * Refresh browser to reset all filters
                 """),width='auto')
                 ])
