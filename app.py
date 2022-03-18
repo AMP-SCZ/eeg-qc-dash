@@ -115,17 +115,13 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
             # technician filter
             dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
+
+            # filter button
+            dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0))
             
         ]),
         
         dcc.Loading(html.Div(id='loading'),type='cube'),
-        html.Br(),
-        
-        dbc.Row([
-            # filter button
-            dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0)),
-            dbc.Col([html.Button('Save', id='save', n_clicks=0), html.Div(id='last-saved')]),
-        ]),
         html.Br(),
         html.Br(),
 
@@ -133,7 +129,6 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             sticky='top',
             color='white'
         ),
-        # html.Div(id='avg-table'),
 
         html.Br(),
         html.Br(),
@@ -141,7 +136,13 @@ https://github.com/AMP-SCZ/eeg-qc-dash
         html.Div(id='table'),
         html.Br(),
 
-        dcc.Store(id='properties')
+        dcc.Store(id='properties'),
+
+        dbc.Navbar([html.Button('Save', id='save', n_clicks=0), html.Div(id='last-saved')],
+            fixed='bottom',
+            color='white'
+        )
+
 
     ]
 
