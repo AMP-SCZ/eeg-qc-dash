@@ -55,6 +55,8 @@ score_options=[
 
 app.layout= html.Div(
     children= [
+        html.Details([html.Summary('Hide introduction'),
+        html.Br(),
         dbc.Row([
             dbc.Col(html.Img(src='https://avatars.githubusercontent.com/u/75388309?s=400&u=0d32212fdb2b3bf3854ed6624ce9f011ca6de29c&v=4', id='ampscz'),width=2),
             dbc.Col([
@@ -79,7 +81,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 """),width='auto')
                 ])
             ])
-        ]),
+        ])], open=True),
         html.Hr(),
         html.Br(),
 
@@ -122,7 +124,6 @@ https://github.com/AMP-SCZ/eeg-qc-dash
         ]),
         
         dcc.Loading(html.Div(id='loading'),type='cube'),
-        html.Br(),
         html.Br(),
 
         dbc.Navbar(html.Div(id='avg-table'),
