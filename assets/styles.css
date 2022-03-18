@@ -29,6 +29,8 @@ input {
 
 #save {
     background: lightgreen;
+    margin-right: 10px;
+    margin-left: 20px;
 }
 
 img {
@@ -46,6 +48,8 @@ img {
      To circumvent this issue, set width: 100%;
     */
     width: 100%;
+}
 
-    // background: white;
+summary {
+    font-weight: bold;
 }
