@@ -173,8 +173,9 @@ props_file= '.scores.pkl'
     Input('site','value'),
     Input('qcimg','value'),
     Input('score','value'),
+    Input('tech','value'),
     Input('global-filter', 'n_clicks')])
-def render_table(start, end, site, qcimg, score, click):
+def render_table(start, end, site, qcimg, score, tech, click):
     
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     # trigger initial callback but condition future callbacks
@@ -235,8 +236,37 @@ def render_table(start, end, site, qcimg, score, click):
             props= pickle.load(f)
 
 
-    # TODO 
     # filter by technician
+    if tech:
+
+        dirs2=[]
+        for d in dirs:
+            # one try-except deals with run_sheet absence and eeg_tech code absence
+            try:
+                draw= d.replace('processed','raw')
+                run_sheet= glob(dirname(dirname(draw))+ '/*.Run_sheet_eeg.csv')[0]
+                run_sheet_df= pd.read_csv(run_sheet)
+                # print(run_sheet)
+
+                if 'field value' in run_sheet_df.columns:
+                    eeg_tech= run_sheet_df['field value'][run_sheet_df['field name'] \
+                        =='chreeg_primaryperson'].values[0]
+                elif 'Unnamed: 0' in run_sheet_df.columns:
+                    eeg_tech= run_sheet_df['0'][run_sheet_df['Unnamed: 0'] \
+                        =='chreeg_primaryperson'].values[0]
+                else:
+                    continue
+                
+                # print(eeg_tech)
+
+                if tech.lower() == eeg_tech.lower():
+                    dirs2.append(d)
+            except:
+                pass
+                print(draw)
+
+        dirs= dirs2.copy()
+
 
     qcimg= sorted(qcimg)
     headers= ['Index','Subject','Session','QC Score']+ qcimg
