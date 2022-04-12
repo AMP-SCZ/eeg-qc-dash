@@ -189,12 +189,19 @@ def render_table(start, end, site, qcimg, score, click):
     
     dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
 
-    # sort dirs by sub_ses
     keys=[]
     for d in dirs:
-        keys.append('_'.join(d.split('/')[-4:-1]))
+        # sort dirs by sub_ses
+        # keys.append('_'.join(d.split('/')[-4:-1]))
         # example key: LA00012_eeg_ses-20211118
+
+        # sort dirs by ses
+        keys.append(d.split('/')[-2])
+        # example key: ses-20211118
+
     dirs=[dirs[i] for i in np.argsort(keys)]
+    # reverse chronological sort
+    dirs=dirs[::-1]
     
 
     # filter by date
