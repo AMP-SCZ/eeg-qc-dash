@@ -11,7 +11,7 @@ from os.path import isfile, isdir, abspath, join as pjoin, dirname, splitext, ba
 from os import makedirs, getenv, remove, listdir
 
 import re, pickle
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
 import logging
@@ -51,6 +51,10 @@ score_options=[
     {'label':'4 | Excellent','value':4}
 ]
 
+
+# show one month of images as default
+end_date= datetime.now().strftime("%Y/%m/%d")
+start_date= (datetime.now()-timedelta(days=30)).strftime("%Y/%m/%d")
 
 
 app.layout= html.Div(
@@ -96,9 +100,11 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             # date filter
             dbc.Col(
                 html.Div([
-                    dcc.Input(id='start',placeholder='yyyy/mm/dd',debounce=True),
+                    dcc.Input(id='start',placeholder='yyyy/mm/dd',debounce=True,
+                        value=start_date),
                     '--',
-                    dcc.Input(id='end',placeholder='yyyy/mm/dd',debounce=True),
+                    dcc.Input(id='end',placeholder='yyyy/mm/dd',debounce=True,
+                        value=end_date),
                 ]),
                 width='auto'
             ),
