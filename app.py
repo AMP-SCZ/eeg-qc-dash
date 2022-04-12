@@ -112,8 +112,8 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
                 options=suffixes, multi=True, placeholder='column(s)',
-                value=['_QCresponseAccuracy','_QCresponseTime','_QCrestAlpha'])),
-                # value=suffixes)),
+                # value=['_QCresponseAccuracy','_QCresponseTime','_QCrestAlpha'])),
+                value=suffixes)),
                 width=3
             ),
 
