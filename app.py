@@ -75,7 +75,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 * Enter date as `yyyy/mm/dd`
                 """),width='auto'),
                     dbc.Col(dcc.Markdown("""
-* Example of `site`: LA, PA, avg
+* Example of `site`: LA, PA, ME
 * Score -9 indicates not yet checked
 * Refresh browser to reset all filters
                 """),width='auto')
