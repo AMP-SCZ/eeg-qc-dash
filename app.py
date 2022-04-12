@@ -109,6 +109,14 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 width='auto'
             ),
 
+            # site filter
+            dbc.Col(html.Div(dcc.Input(id='site',placeholder='site',debounce=True)),
+                width='auto'
+            ),
+
+            # technician filter
+            dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
+
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
                 options=suffixes, multi=True, placeholder='column(s)',
@@ -117,19 +125,11 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 width=3
             ),
 
-            # site filter
-            dbc.Col(html.Div(dcc.Input(id='site',placeholder='site',debounce=True)),
-                width='auto'
-            ),
-
             # QC score filter
             dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
                 options=score_options)),
                 width=2
             ),
-
-            # technician filter
-            dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
 
             # filter button
             dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0))
@@ -227,15 +227,6 @@ def render_table(start, end, site, qcimg, score, tech, click):
         dirs= [d for d in dirs if site in d]
 
 
-    if not isfile(props_file):
-        # initialize scores
-        props={}
-    else:
-        # load scores
-        with open(props_file,'rb') as f:
-            props= pickle.load(f)
-
-
     # filter by technician
     if tech:
 
@@ -266,6 +257,15 @@ def render_table(start, end, site, qcimg, score, tech, click):
                 print(draw)
 
         dirs= dirs2.copy()
+
+
+    if not isfile(props_file):
+        # initialize scores
+        props={}
+    else:
+        # load scores
+        with open(props_file,'rb') as f:
+            props= pickle.load(f)
 
 
     qcimg= sorted(qcimg)
