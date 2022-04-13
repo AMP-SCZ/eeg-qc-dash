@@ -55,7 +55,8 @@ score_options=[
 # show one month of images as default
 end_date= datetime.now().strftime("%Y/%m/%d")
 start_date= (datetime.now()-timedelta(days=30)).strftime("%Y/%m/%d")
-
+# end_date=''
+# start_date=''
 
 app.layout= html.Div(
     children= [
@@ -232,29 +233,30 @@ def render_table(start, end, site, qcimg, score, tech, click):
 
         dirs2=[]
         for d in dirs:
-            # one try-except deals with run_sheet absence and eeg_tech code absence
+            # one try-except deals with
+            # run_sheet absence, unexpected run_sheet columns, and eeg_tech code absence
             try:
-                draw= d.replace('processed','raw')
-                run_sheet= glob(dirname(dirname(draw))+ '/*.Run_sheet_eeg.csv')[0]
+                run_sheet_dir= dirname(dirname(d.replace('processed','raw')))
+                run_sheet= glob(run_sheet_dir+ '/*.Run_sheet_eeg.csv')[0]
                 run_sheet_df= pd.read_csv(run_sheet)
-                # print(run_sheet)
 
+                eeg_tech=''
                 if 'field value' in run_sheet_df.columns:
                     eeg_tech= run_sheet_df['field value'][run_sheet_df['field name'] \
-                        =='chreeg_primaryperson'].values[0]
+                        =='chreeg_primaryperson']
+                    eeg_tech= eeg_tech[eeg_tech.notnull()].values[0]
                 elif 'Unnamed: 0' in run_sheet_df.columns:
                     eeg_tech= run_sheet_df['0'][run_sheet_df['Unnamed: 0'] \
-                        =='chreeg_primaryperson'].values[0]
-                else:
-                    continue
+                        =='chreeg_primaryperson']
+                    eeg_tech= eeg_tech[eeg_tech.notnull()].values[0]
                 
-                # print(eeg_tech)
+                # print(run_sheet, eeg_tech)
 
                 if tech.lower() == eeg_tech.lower():
                     dirs2.append(d)
             except:
                 pass
-                print(draw)
+                print(f'no/problematic: {run_sheet_dir}/*.Run_sheet_eeg.csv')
 
         dirs= dirs2.copy()
 
