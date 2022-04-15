@@ -52,11 +52,6 @@ score_options=[
 ]
 
 
-# show one month of images as default
-end_date= datetime.now().strftime("%Y/%m/%d")
-start_date= (datetime.now()-timedelta(days=30)).strftime("%Y/%m/%d")
-# end_date=''
-# start_date=''
 
 app.layout= html.Div(
     children= [
@@ -99,13 +94,14 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
         dbc.Row([
             # date filter
+            # show one month of images as default
             dbc.Col(
                 html.Div([
                     dcc.Input(id='start',placeholder='yyyy/mm/dd',debounce=True,
-                        value=start_date),
+                        value=(datetime.now()-timedelta(days=30)).strftime("%Y/%m/%d")),
                     '--',
                     dcc.Input(id='end',placeholder='yyyy/mm/dd',debounce=True,
-                        value=end_date),
+                        value=datetime.now().strftime("%Y/%m/%d")),
                 ]),
                 width='auto'
             ),
@@ -118,9 +114,16 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             # technician filter
             dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
 
+            # row order
+            dbc.Col(html.Div(dcc.Dropdown(id='sort-order', className='ddown',
+                options=['Latest first','Earliest first','Alphabetical'],
+                value='Latest first')),
+                width=1
+            ),
+
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
-                options=suffixes, multi=True, placeholder='column(s)',
+                options=suffixes, multi=True,
                 # value=['_QCresponseAccuracy','_QCresponseTime','_QCrestAlpha'])),
                 value=suffixes)),
                 width=3
