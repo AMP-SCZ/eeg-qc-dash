@@ -178,14 +178,16 @@ props_file= '.scores.pkl'
     Input('qcimg','value'),
     Input('score','value'),
     Input('tech','value'),
+    Input('sort-order','value'),
     Input('global-filter', 'n_clicks')])
-def render_table(start, end, site, qcimg, score, tech, click):
+def render_table(start, end, site, qcimg, score, tech, order, click):
     
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     # trigger initial callback but condition future callbacks
     if changed=='.':
         pass
-    elif (start or end or site or qcimg or score) and ('global-filter' not in changed):
+    elif (start or end or site or qcimg or score or tech or order) and \
+            ('global-filter' not in changed):
         raise PreventUpdate
     elif not qcimg:
         raise PreventUpdate
@@ -196,17 +198,19 @@ def render_table(start, end, site, qcimg, score, tech, click):
 
     keys=[]
     for d in dirs:
-        # sort dirs by sub_ses
-        # keys.append('_'.join(d.split('/')[-4:-1]))
-        # example key: LA00012_eeg_ses-20211118
-
-        # sort dirs by ses
-        keys.append(d.split('/')[-2])
-        # example key: ses-20211118
+        if order=='Alphabetical':
+            # sort dirs by sub_ses
+            keys.append('_'.join(d.split('/')[-4:-1]))
+            # example key: LA00012_eeg_ses-20211118
+        else:
+            # sort dirs by ses
+            keys.append(d.split('/')[-2])
+            # example key: ses-20211118
 
     dirs=[dirs[i] for i in np.argsort(keys)]
-    # reverse chronological sort
-    dirs=dirs[::-1]
+    if order=='Latest first':
+        # reverse chronological sort
+        dirs=dirs[::-1]
     
 
     # filter by date
