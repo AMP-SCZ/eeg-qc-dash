@@ -97,11 +97,9 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             # show one month of images as default
             dbc.Col(
                 html.Div([
-                    dcc.Input(id='start',placeholder='yyyy/mm/dd',debounce=True,
-                        value=(datetime.now()-timedelta(days=30)).strftime("%Y/%m/%d")),
+                    dcc.Input(id='start',placeholder='yyyy/mm/dd',debounce=True),
                     '--',
-                    dcc.Input(id='end',placeholder='yyyy/mm/dd',debounce=True,
-                        value=datetime.now().strftime("%Y/%m/%d")),
+                    dcc.Input(id='end',placeholder='yyyy/mm/dd',debounce=True),
                 ]),
                 width='auto'
             ),
@@ -168,6 +166,21 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
 
 props_file= '.scores.pkl'
+
+
+# set default dates only at initial callback
+@app.callback([Output('start','value'),
+    Output('end','value')],
+    Input('global-filter', 'n_clicks'))
+def set_dates(click):
+
+    if not click:
+        start=(datetime.now()-timedelta(days=30)).strftime("%Y/%m/%d")
+        end=datetime.now().strftime("%Y/%m/%d")
+        
+        return start,end
+    
+    raise PreventUpdate
 
 
 @app.callback([Output('table','children'),
