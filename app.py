@@ -166,6 +166,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
 
 props_file= '.scores.pkl'
+click_record= '.click'
 
 
 # set default dates only at initial callback
@@ -195,15 +196,19 @@ def set_dates(click):
     Input('global-filter', 'n_clicks')])
 def render_table(start, end, site, qcimg, score, tech, order, click):
     
-    changed = [p['prop_id'] for p in callback_context.triggered][0]
-    # trigger initial callback but condition future callbacks
-    if changed=='start.value':
-        pass
-    elif (start or end or site or qcimg or score or tech or order) and \
-            ('global-filter' not in changed):
+    # trigger initial callback but condition future callbacks on click
+    if isfile(click_record):
+        with open(click_record) as f:
+            old_click= int(f.read())
+    else:
+        old_click=-1
+
+    if click==old_click:
         raise PreventUpdate
-    elif not qcimg:
-        raise PreventUpdate
+    else:
+        with open(click_record,'w') as f:
+            f.write(str(click))
+            
 
     print('executing render_table')
     
