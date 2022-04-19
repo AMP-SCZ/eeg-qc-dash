@@ -15,10 +15,6 @@ input#start {
     margin-right: 10px;
 }
 
-input#end {
-    margin-left: 10px;
-}
-
 input {
     width: 90px;
 }
