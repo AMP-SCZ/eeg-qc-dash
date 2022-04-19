@@ -95,14 +95,20 @@ https://github.com/AMP-SCZ/eeg-qc-dash
         dbc.Row([
             # date filter
             # show one month of images as default
-            dbc.Col(
-                html.Div([
-                    dcc.Input(id='start',placeholder='yyyy/mm/dd',debounce=True),
-                    '--',
-                    dcc.Input(id='end',placeholder='yyyy/mm/dd',debounce=True),
-                ]),
-                width='auto'
-            ),
+            dbc.Col([
+                dcc.Input(id='start',placeholder='yyyy/mm/dd',debounce=True),
+                html.Br(),
+                'Earliest'
+            ], width='auto'),
+
+            dbc.Col('←-→', style={'margin-top':'10px'}, width='auto'),
+
+            dbc.Col([
+                dcc.Input(id='end',placeholder='yyyy/mm/dd',debounce=True),
+                html.Br(),
+                'Latest'
+            ], width='auto'),
+
 
             # site filter
             dbc.Col(html.Div(dcc.Input(id='site',placeholder='site',debounce=True)),
@@ -113,9 +119,11 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
 
             # row order
-            dbc.Col(html.Div(dcc.Dropdown(id='sort-order', className='ddown',
+            dbc.Col(html.Div([dcc.Dropdown(id='sort-order', className='ddown',
                 options=['Latest first','Earliest first','Alphabetical'],
-                value='Latest first')),
+                value='Latest first'),
+                'Sort order'
+                ]),
                 width=1
             ),
 
