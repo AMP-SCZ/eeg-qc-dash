@@ -119,9 +119,11 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
 
             # row order
-            dbc.Col(html.Div(dcc.Dropdown(id='sort-order', className='ddown',
+            dbc.Col(html.Div([dcc.Dropdown(id='sort-order', className='ddown',
                 options=['Latest first','Earliest first','Alphabetical'],
-                value='Latest first')),
+                value='Latest first'),
+                'Sort order'
+                ]),
                 width=1
             ),
 
