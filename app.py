@@ -517,5 +517,6 @@ def render_avg_table(site, qcimg, click):
 
 
 if __name__=='__main__':
-    app.run_server(debug=True, host='localhost')
+    # debug=None allows control via DASH_DEBUG variable
+    app.run_server(debug=None, host='localhost')
 
