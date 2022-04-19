@@ -197,7 +197,7 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
     
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     # trigger initial callback but condition future callbacks
-    if changed=='.':
+    if changed=='start.value':
         pass
     elif (start or end or site or qcimg or score or tech or order) and \
             ('global-filter' not in changed):
