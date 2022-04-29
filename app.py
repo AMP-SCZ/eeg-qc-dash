@@ -35,11 +35,12 @@ log.setLevel(logging.ERROR)
 
 suffixes= [
     '_QCcounts',
+    '_QCimg',
     '_QCimpedance',
     '_QClineNoise',
     '_QCresponseAccuracy',
+    '_QCrestAlpha',
     '_QCresponseTime',
-    '_QCrestAlpha'
 ]
 
 
@@ -101,7 +102,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 'Earliest'
             ], width='auto'),
 
-            dbc.Col('←-→', style={'margin-top':'10px'}, width='auto'),
+            dbc.Col('←—→', style={'margin-top':'10px'}, width='auto'),
 
             dbc.Col([
                 dcc.Input(id='end',placeholder='yyyy/mm/dd',debounce=True),
@@ -130,8 +131,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
                 options=suffixes, multi=True,
-                # value=['_QCresponseAccuracy','_QCresponseTime','_QCrestAlpha'])),
-                value=suffixes)),
+                value=suffixes[:-1])),
                 width=3
             ),
 
@@ -333,15 +333,14 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         # filter by columns
         if qcimg:
             imgs2=[]
-            for img in imgs:
-                for q in qcimg:
+            for q in qcimg:
+                for img in imgs:
                     if img.endswith(f'{q}.png'):
                         imgs2.append(img)
                         break
 
             imgs= imgs2.copy()
  
-        imgs= sorted(imgs)
         # print(imgs)
         
         # filter by QC score
@@ -486,15 +485,13 @@ def render_avg_table(site, qcimg, click):
         # filter by columns
         if qcimg:
             imgs2=[]
-            for img in imgs:
-                for q in qcimg:
+            for q in qcimg:
+                for img in imgs:
                     if img.endswith(f'{q}.png'):
                         imgs2.append(img)
                         break
 
             imgs= imgs2.copy()
-
-        imgs= sorted(imgs)
         
         # print(imgs)
 
