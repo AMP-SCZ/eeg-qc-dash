@@ -16,6 +16,7 @@ import pandas as pd
 import numpy as np
 import logging
 from glob import glob
+import json
 
 from subprocess import check_call
 
@@ -43,6 +44,14 @@ suffixes= [
     '_QCresponseTime',
 ]
 
+
+with open('sites.json') as f:
+    sites= json.load(f)
+
+sites2=[]
+for s in sites:
+    sites2.append({'label':s['id']+' | '+s['name'], 'value':s['id']})
+sites=sites2.copy()
 
 score_options=[
     {'label':'-9 | Unchecked','value':-9},
@@ -112,8 +121,10 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
 
             # site filter
-            dbc.Col(html.Div(dcc.Input(id='site',placeholder='site',debounce=True)),
-                width='auto'
+            dbc.Col(html.Div(dcc.Dropdown(id='site',placeholder='site',
+                options=sites,
+                value='')),
+                width=2
             ),
 
             # technician filter
