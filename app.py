@@ -372,8 +372,15 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
                         placeholder='comment',
                         rows=30,cols=20)
                     ])]+ \
-                [html.Td(html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
-                    width='100%',height='auto')) for img in imgs]
+                [html.Td(
+                    html.A(
+                        html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
+                            width='100%',height='auto'
+                        ),
+                        href=img.replace(ROOTDIR,URL_PREFIX),
+                        target='_blank'
+                    )
+                ) for img in imgs]
             )
         )
         
