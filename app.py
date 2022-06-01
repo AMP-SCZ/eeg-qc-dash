@@ -34,15 +34,16 @@ app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callbac
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-suffixes= [
-    '_QCcounts',
-    '_QCimg',
-    '_QCimpedance',
-    '_QClineNoise',
-    '_QCresponseAccuracy',
-    '_QCrestAlpha',
-    '_QCresponseTime',
-]
+suffixes= {
+    '_QCcounts':1,
+    '_QCimg':1,
+    '_QCimpedance':1,
+    '_QClineNoise':1,
+    '_QCbridge.png':0,
+    '_QCresponseAccuracy':1,
+    '_QCrestAlpha':1,
+    '_QCresponseTime':0
+}
 
 
 with open('sites.json') as f:
@@ -141,8 +142,8 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
-                options=suffixes, multi=True,
-                value=suffixes[:-1])),
+                options=list(suffixes.keys()), multi=True,
+                value=[s for s,d in suffixes.items() if d])),
                 width=3
             ),
 
