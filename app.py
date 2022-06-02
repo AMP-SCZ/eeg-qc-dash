@@ -34,16 +34,16 @@ app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callbac
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-suffixes= {
-    '_QCcounts':1,
-    '_QCimg':1,
-    '_QCimpedance':1,
-    '_QClineNoise':1,
-    '_QCbridge.png':0,
-    '_QCresponseAccuracy':1,
-    '_QCrestAlpha':1,
-    '_QCresponseTime':0
-}
+# suffixes= {
+#     '_QCcounts':1,
+#     '_QCimg':1,
+#     '_QCimpedance':1,
+#     '_QClineNoise':1,
+#     '_QCbridge.png':0,
+#     '_QCresponseAccuracy':1,
+#     '_QCrestAlpha':1,
+#     '_QCresponseTime':0
+# }
 
 
 with open('sites.json') as f:
@@ -142,8 +142,9 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
-                options=list(suffixes.keys()), multi=True,
-                value=[s for s,d in suffixes.items() if d])),
+                # options=list(suffixes.keys()),
+                # value=[s for s,d in suffixes.items() if d],
+                multi=True)),
                 width=3
             ),
 
@@ -193,7 +194,9 @@ with open(click_record,'w') as f:
 
 # set default dates only at initial callback
 @app.callback([Output('start','value'),
-    Output('end','value')],
+    Output('end','value'),
+    Output('qcimg', 'options'),
+    Output('qcimg', 'value')],
     Input('global-filter', 'n_clicks'))
 def set_dates(click):
 
@@ -201,7 +204,12 @@ def set_dates(click):
         start=(datetime.now()-timedelta(days=30)).strftime("%Y/%m/%d")
         end=datetime.now().strftime("%Y/%m/%d")
         
-        return start,end
+        # qcimg dropdown menu
+        df= pd.read_csv(pjoin(ROOTDIR,'eeg_qc_images.csv'))
+        options=df['img'].values
+        value=df[df['default']==1]['img'].values
+        
+        return start,end,options,value
     
     raise PreventUpdate
 
@@ -437,7 +445,6 @@ def save_data(click,scores,comments,ids,props):
 
 
 @app.callback(Output('avg-table','children'),
-    # Output('properties','data'),
     [Input('site','value'),
     Input('qcimg','value'),
     Input('global-filter', 'n_clicks')])
@@ -451,7 +458,7 @@ def render_avg_table(site, qcimg, click):
         raise PreventUpdate
     elif not qcimg:
         raise PreventUpdate
-    
+
     # if we do not glob, finding dirs would be difficult
     # because of Pronet/Prescient ramification
     dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
