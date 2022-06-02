@@ -354,10 +354,16 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         if qcimg:
             imgs2=[]
             for q in qcimg:
+                found=0
                 for img in imgs:
                     if img.endswith(f'{q}.png'):
                         imgs2.append(img)
+                        found=1
                         break
+
+                # render empty column for nonexistent images
+                if not found:
+                    imgs2.append('')
 
             imgs= imgs2.copy()
  
@@ -512,10 +518,16 @@ def render_avg_table(site, qcimg, click):
         if qcimg:
             imgs2=[]
             for q in qcimg:
+                found=0
                 for img in imgs:
                     if img.endswith(f'{q}.png'):
                         imgs2.append(img)
+                        found=1
                         break
+
+                # render empty column for nonexistent images
+                if not found:
+                    imgs2.append('')
 
             imgs= imgs2.copy()
         
