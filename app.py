@@ -338,7 +338,6 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
             props= pickle.load(f)
 
 
-    qcimg= sorted(qcimg)
     headers= ['Index','Subject','Session','QC Score']+ qcimg
     head= [html.Tr([html.Th(h) for h in headers])]
     body=[]
@@ -509,7 +508,6 @@ def render_avg_table(site, qcimg, click):
 
 
     # sticky-top table
-    qcimg= sorted(qcimg)
     headers= ['Index','Subject','Session','QC Score']+ qcimg
     head= [html.Tr([html.Th(h) for h in headers])]
     body=[]
