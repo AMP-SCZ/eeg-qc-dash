@@ -287,30 +287,44 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
 
         dirs2=[]
         for d in dirs:
+            ses= re.search('ses-(.+?)/', d).group(1)
             # one try-except deals with
-            # run_sheet absence, unexpected run_sheet columns, and eeg_tech code absence
+            # run_sheet absence and eeg_tech code absence
             try:
                 run_sheet_dir= dirname(dirname(d.replace('processed','raw')))
-                run_sheet= glob(run_sheet_dir+ '/*.Run_sheet_eeg.csv')[0]
-                run_sheet_df= pd.read_csv(run_sheet)
+                sheets= glob(run_sheet_dir+ '/*.Run_sheet_eeg_?.csv')
 
                 eeg_tech=''
-                if 'field value' in run_sheet_df.columns:
-                    eeg_tech= run_sheet_df['field value'][run_sheet_df['field name'] \
-                        =='chreeg_primaryperson']
-                    eeg_tech= eeg_tech[eeg_tech.notnull()].values[0]
-                elif 'Unnamed: 0' in run_sheet_df.columns:
-                    eeg_tech= run_sheet_df['0'][run_sheet_df['Unnamed: 0'] \
-                        =='chreeg_primaryperson']
-                    eeg_tech= eeg_tech[eeg_tech.notnull()].values[0]
-                
-                # print(run_sheet, eeg_tech)
+                for r in sheets:
+                    print('reading', basename(r))
+                    run_sheet_df= pd.read_csv(r, on_bad_lines='skip')
+                    
+                    if run_sheet_df.shape[0]>1:
+                        # ProNET
+                        for _,row in run_sheet_df.iterrows():
+                            if row['field_name']=='chreeg_interview_date':
+                                tmp_date=row['field_value'].replace('-','')
+                            elif row['field_name']=='chreeg_primaryperson':
+                                tmp_tech=row['field_value']
+                        if ses==tmp_date:
+                            eeg_tech=tmp_tech
+                            break
 
+                    else:
+                        # PRESCIENT
+                        # convert date to YMD
+                        tmp_date=datetime.strptime(run_sheet_df.loc[0,'interview_date'],
+                            '%m/%d/%Y').strftime('%Y%m%d')
+                        if ses==tmp_date:
+                            eeg_tech= run_sheet_df.loc[0,'chreeg_primaryperson']
+                            break
+                
+                # print(eeg_tech)
                 if tech.lower() == eeg_tech.lower():
                     dirs2.append(d)
             except:
                 pass
-                print(f'no/problematic: {run_sheet_dir}/*.Run_sheet_eeg.csv')
+                print(f'no/problematic: {run_sheet_dir}/*.Run_sheet_eeg_?.csv\n')
 
         dirs= dirs2.copy()
 
