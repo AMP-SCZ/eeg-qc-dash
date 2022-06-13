@@ -315,7 +315,6 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
                         # convert date to YMD
                         tmp_date=datetime.strptime(run_sheet_df.loc[0,'interview_date'],
                             '%m/%d/%Y').strftime('%Y%m%d')
-                        # print(ses, tmp)
                         if ses==tmp_date:
                             eeg_tech= run_sheet_df.loc[0,'chreeg_primaryperson']
                             break
