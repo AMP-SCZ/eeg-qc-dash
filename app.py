@@ -186,8 +186,8 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 )
 
 
-props_file= '.scores.pkl'
-click_record= '.click'
+props_file= pjoin(ROOTDIR,'.scores.pkl')
+click_record= pjoin(ROOTDIR,'.click')
 with open(click_record,'w') as f:
     f.write('-1')
 
@@ -240,9 +240,8 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
             
 
     print('executing render_table')
-    
-    dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
-
+    # strict glob pattern to avoid https://github.com/AMP-SCZ/eeg-qc-dash/issues/17
+    dirs= glob(pjoin(ROOTDIR,'*/PHOENIX/PROTECTED/*/processed/*/eeg/*/Figures'))
     keys=[]
     for d in dirs:
         if order=='Alphabetical':
