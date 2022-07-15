@@ -205,11 +205,12 @@ def set_dates(click):
         end=datetime.now().strftime("%Y/%m/%d")
         
         # qcimg dropdown menu
-        df= pd.read_csv(pjoin(ROOTDIR,'eeg_qc_images.csv'))
+        df= pd.read_csv(pjoin(ROOTDIR,'eeg_qc_images.csv'),on_bad_lines='skip',engine='python')
         options=df['img'].values
         value=df[df['default']==1]['img'].values
         
-        return start,end,options,value
+        # return start,end,options,value
+        return '','',options,value
     
     raise PreventUpdate
 
@@ -296,7 +297,7 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
                 eeg_tech=''
                 for r in sheets:
                     print('reading', basename(r))
-                    run_sheet_df= pd.read_csv(r, on_bad_lines='skip')
+                    run_sheet_df= pd.read_csv(r, on_bad_lines='skip', engine='python')
                     
                     if run_sheet_df.shape[0]>1:
                         # ProNET
@@ -336,7 +337,7 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         with open(props_file,'rb') as f:
             props= pickle.load(f)
 
-
+    
     headers= ['Index','Subject','Session','QC Score']+ qcimg
     head= [html.Tr([html.Th(h) for h in headers])]
     body=[]
@@ -468,14 +469,15 @@ def save_data(click,scores,comments,ids,props):
     Input('global-filter', 'n_clicks')])
 def render_avg_table(site, qcimg, click):
 
-    changed = [p['prop_id'] for p in callback_context.triggered][0]
-    # trigger initial callback but condition future callbacks
-    if changed=='.':
-        pass
-    elif (site or qcimg) and ('global-filter' not in changed):
+    # trigger initial callback but condition future callbacks on click
+    with open(click_record) as f:
+        old_click= int(f.read())
+
+    # print(f'click {click} , old_click {old_click}')
+
+    if click==old_click:
         raise PreventUpdate
-    elif not qcimg:
-        raise PreventUpdate
+
 
     # if we do not glob, finding dirs would be difficult
     # because of Pronet/Prescient ramification
