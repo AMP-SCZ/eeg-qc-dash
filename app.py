@@ -219,6 +219,7 @@ def set_dates(click):
 
 @app.callback([Output('table','children'),
     Output('properties','data'),
+    Output('avg-table','children'),
     Output('loading','children')],
     [Input('start','value'), Input('end','value'),
     Input('site','value'),
@@ -236,6 +237,7 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
     print('executing render_table')
     # strict glob pattern to avoid https://github.com/AMP-SCZ/eeg-qc-dash/issues/17
     dirs= glob(pjoin(ROOTDIR,'*/PHOENIX/PROTECTED/*/processed/*/eeg/*/Figures'))
+    dirs_all= dirs.copy()
     keys=[]
     for d in dirs:
         if order=='Alphabetical':
@@ -341,7 +343,6 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         sub= parts[-4]
         ses= parts[-2].split('-')[1]
         sub_ses= f'{sub}_{ses}'
-        imgs= glob(f'{d}/*[!QC].png')
        
         # initialize scores 
         if f'{sub}_{ses}' not in props:
@@ -356,6 +357,8 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         if 'avg' in d:
             continue
 
+
+        imgs= glob(f'{d}/*[!QC].png')
         # filter by columns
         if qcimg:
             imgs2=[]
@@ -408,74 +411,14 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         i+=1
  
 
-    with open(props_file,'wb') as f:
-        pickle.dump(props,f)
-
     table=dbc.Table([html.Thead(head),html.Tbody(body)],
         bordered=True,
         hover=True)
 
-    return table,props,True
 
-
-
-@app.callback(Output('last-saved','children'),
-    [Input('save','n_clicks'),
-    Input({'sub_ses':ALL},'value'),
-    Input({'sub_ses-1':ALL},'value'),
-    Input({'sub_ses':ALL},'id'),
-    Input('properties','data')])
-def save_data(click,scores,comments,ids,props):
-
-    changed = [p['prop_id'] for p in callback_context.triggered][0]
-    if 'save' not in changed:
-        raise PreventUpdate
-
-    print('executing save_data')
-    
-    # even after filtering, props contain all scores
-    # so loading of all scores from file is not required
-    # load all scores 
-    # with open(props_file,'rb') as f:
-    #     props_all= pickle.load(f)
-    
-    # update changed scores
-    for n,s,c in zip(ids,scores,comments):
-        sub_ses= n['sub_ses']
-        props[sub_ses]=s
-        props[sub_ses+'-1']=c
-
-    # print(props)
-
-    # save all scores
-    with open(props_file,'wb') as f:
-        pickle.dump(props,f)
-  
-
-    return 'Last saved on '+ datetime.now().ctime()
-
-
-
-@app.callback(Output('avg-table','children'),
-    [Input('site','value'),
-    Input('qcimg','value'),
-    Input('global-filter', 'n_clicks')])
-def render_avg_table(site, qcimg, click):
-
-    # trigger initial callback but condition future callbacks on click
-    with open(click_record) as f:
-        old_click= int(f.read())
-
-    # print(f'click {click} , old_click {old_click}')
-
-    if click==old_click:
-        raise PreventUpdate
-
-
-    # if we do not glob, finding dirs would be difficult
-    # because of Pronet/Prescient ramification
-    dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
-
+    # populate avg-table
+    # reset dirs
+    dirs= dirs_all.copy()
     # we need only these rows, so filter now to preserve order
     subjects=['GRANavg']
     if site:
@@ -490,16 +433,6 @@ def render_avg_table(site, qcimg, click):
     
     dirs= dirs2.copy()
     
-    # print(dirs)
-
-    if not isfile(props_file):
-        # initialize scores
-        props={}
-    else:
-        # load scores
-        with open(props_file,'rb') as f:
-            props= pickle.load(f)
-
 
     # sticky-top table
     headers= ['Index','Subject','Session','QC Score']+ qcimg
@@ -512,14 +445,7 @@ def render_avg_table(site, qcimg, click):
         ses= parts[-2].split('-')[1]
         sub_ses= f'{sub}_{ses}'
         imgs= glob(f'{d}/*[!QC].png')
-        
-        # initialize scores
-        if f'{sub}_{ses}' not in props:
-            # score
-            props[sub_ses]=-9
-            # comment
-            props[sub_ses+'-1']=''
-        
+                
         # filter by columns
         if qcimg:
             imgs2=[]
@@ -568,14 +494,51 @@ def render_avg_table(site, qcimg, click):
         i+=1
 
 
-
-    table=dbc.Table([html.Thead(head),html.Tbody(body)],
+    avg_table=dbc.Table([html.Thead(head),html.Tbody(body)],
         bordered=True,
         hover=True)
 
+    # finally, save all scores for future callback of render_table
+    with open(props_file,'wb') as f:
+        pickle.dump(props,f)
 
-    return table
+    return table,props,avg_table,True
+
+
+@app.callback(Output('last-saved','children'),
+    [Input('save','n_clicks'),
+    Input({'sub_ses':ALL},'value'),
+    Input({'sub_ses-1':ALL},'value'),
+    Input({'sub_ses':ALL},'id'),
+    Input('properties','data')])
+def save_data(click,scores,comments,ids,props):
+
+    changed = [p['prop_id'] for p in callback_context.triggered][0]
+    if 'save' not in changed:
+        raise PreventUpdate
+
+    print('executing save_data')
     
+    # even after filtering, props contain all scores
+    # so loading of all scores from file is not required
+    # load all scores 
+    # with open(props_file,'rb') as f:
+    #     props_all= pickle.load(f)
+    
+    # update changed scores
+    for n,s,c in zip(ids,scores,comments):
+        sub_ses= n['sub_ses']
+        props[sub_ses]=s
+        props[sub_ses+'-1']=c
+
+    # print(props)
+
+    # save all scores
+    with open(props_file,'wb') as f:
+        pickle.dump(props,f)
+  
+
+    return 'Last saved on '+ datetime.now().ctime() 
 
 
 if __name__=='__main__':
