@@ -174,6 +174,8 @@ https://github.com/AMP-SCZ/eeg-qc-dash
         html.Br(),
         html.Br(),
         html.Br(),
+        html.Br(),
+        html.Br(),
 
         dbc.Navbar([html.Button('Save', id='save', n_clicks=0), html.Div(id='last-saved')],
             fixed='bottom',
