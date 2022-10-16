@@ -390,7 +390,9 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
  
         body.append(
             html.Tr(
-                [html.Td(i), html.Td(sub), html.Td(ses)]+ \
+                [html.Td(i), html.Td(sub), html.Td(html.A(ses,
+                    href=d.replace(ROOTDIR,URL_PREFIX)+f'/{sub}_{ses}_runSheet.txt',
+                        target='_blank'))]+ \
                 [html.Td([
                     dcc.Dropdown(value=props[sub_ses],
                         id= {'sub_ses':sub_ses},
