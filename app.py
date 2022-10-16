@@ -387,7 +387,9 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         # it is placed inside the for loop to take advantage of sub_ses
         if score is not None and props[f'{sub}_{ses}']!=score:
             continue
- 
+
+        # example run sheet:
+        # PHOENIX/PROTECTED/PronetWU/processed/WU01590/eeg/ses-20220921/Figures/WU01590_20220921_runSheet.txt
         body.append(
             html.Tr(
                 [html.Td(i), html.Td(sub), html.Td(html.A(ses,
