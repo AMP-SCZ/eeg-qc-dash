@@ -229,18 +229,9 @@ def set_dates(click):
     Input('global-filter', 'n_clicks')])
 def render_table(start, end, site, qcimg, score, tech, order, click):
     
-    # trigger initial callback but condition future callbacks on click
-    with open(click_record) as f:
-        old_click= int(f.read())
-
-    # print(f'click {click} , old_click {old_click}')
-
-    if click==old_click:
+    changed = [p['prop_id'] for p in callback_context.triggered][0]
+    if 'global-filter' not in changed:
         raise PreventUpdate
-    else:
-        with open(click_record,'w') as f:
-            f.write(str(click))
-            
 
     print('executing render_table')
     # strict glob pattern to avoid https://github.com/AMP-SCZ/eeg-qc-dash/issues/17
