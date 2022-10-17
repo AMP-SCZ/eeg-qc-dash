@@ -235,7 +235,7 @@ def set_dates(click):
 def render_table(start, end, site, qcimg, score, tech, order, click):
     
     changed = [p['prop_id'] for p in callback_context.triggered][0]
-    if 'global-filter' not in changed:
+    if 'global-filter' not in changed or not qcimg:
         raise PreventUpdate
 
     print('executing render_table')
@@ -337,6 +337,12 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
             props= pickle.load(f)
 
     
+    qcimg2={}
+    for group in qcimg:
+        for q in group.split('|'):
+            qcimg2[q]=''
+    qcimg=list(qcimg2.keys())
+
     headers= ['Index','Subject','Session','QC Score']+ qcimg
     head= [html.Tr([html.Th(h) for h in headers])]
     body=[]
@@ -364,21 +370,20 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
 
         imgs= glob(f'{d}/*[!QC].png')
         # filter by columns
-        if qcimg:
-            imgs2=[]
-            for q in qcimg:
-                found=0
-                for img in imgs:
-                    if img.endswith(f'{q}.png'):
-                        imgs2.append(img)
-                        found=1
-                        break
+        imgs2=[]
+        for q in qcimg:
+            found=0
+            for img in imgs:
+                if img.endswith(f'{q}.png'):
+                    imgs2.append(img)
+                    found=1
+                    break
 
-                # render empty column for nonexistent images
-                if not found:
-                    imgs2.append('')
+            # render empty column for nonexistent images
+            if not found:
+                imgs2.append('')
 
-            imgs= imgs2.copy()
+        imgs= imgs2.copy()
  
         # print(imgs)
         
@@ -455,21 +460,20 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         imgs= glob(f'{d}/*[!QC].png')
                 
         # filter by columns
-        if qcimg:
-            imgs2=[]
-            for q in qcimg:
-                found=0
-                for img in imgs:
-                    if img.endswith(f'{q}.png'):
-                        imgs2.append(img)
-                        found=1
-                        break
+        imgs2=[]
+        for q in qcimg:
+            found=0
+            for img in imgs:
+                if img.endswith(f'{q}.png'):
+                    imgs2.append(img)
+                    found=1
+                    break
 
-                # render empty column for nonexistent images
-                if not found:
-                    imgs2.append('')
+            # render empty column for nonexistent images
+            if not found:
+                imgs2.append('')
 
-            imgs= imgs2.copy()
+        imgs= imgs2.copy()
         
         # print(imgs)
 
