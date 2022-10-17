@@ -133,7 +133,9 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             ),
 
             # technician filter
-            dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
+            dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True)),
+                width=1
+            ),
 
             # row order
             dbc.Col(html.Div([dcc.Dropdown(id='sort-order', className='ddown',
@@ -149,13 +151,13 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 # options=list(suffixes.keys()),
                 # value=[s for s,d in suffixes.items() if d],
                 multi=True)),
-                width=3
+                width=5
             ),
 
             # QC score filter
             dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
                 options=score_options)),
-                width=2
+                width=1
             ),
 
             # filter button
