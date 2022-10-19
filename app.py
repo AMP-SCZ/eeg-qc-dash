@@ -195,9 +195,6 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
 
 props_file= pjoin(ROOTDIR,'.scores.pkl')
-click_record= pjoin(ROOTDIR,'.click')
-with open(click_record,'w') as f:
-    f.write('-1')
 
 
 # set default dates only at initial callback
