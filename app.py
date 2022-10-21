@@ -396,9 +396,16 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         # PHOENIX/PROTECTED/PronetWU/processed/WU01590/eeg/ses-20220921/Figures/WU01590_20220921_runSheet.txt
         body.append(
             html.Tr(
-                [html.Td(i), html.Td(sub), html.Td(html.A(ses,
-                    href=d.replace(ROOTDIR,URL_PREFIX)+f'/{sub}_{ses}_runSheet.txt',
-                        target='_blank'))]+ \
+                [html.Td(i), html.Td(sub), html.Td([
+                    html.A(ses,
+                        href=d.replace(ROOTDIR,URL_PREFIX)+f'/{sub}_{ses}_runSheet.txt',
+                        target='_blank'),
+                    html.Br(),
+                    html.Br(),
+                    html.A('PDF Sheet',
+                        href=d.replace(ROOTDIR,URL_PREFIX)+f'/{sub}_{ses}_runSheet.txt',
+                        target='_blank')
+                ])]+ \
                 [html.Td([
                     dcc.Dropdown(value=props[sub_ses],
                         id= {'sub_ses':sub_ses},
