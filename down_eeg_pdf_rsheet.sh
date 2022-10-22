@@ -1,5 +1,12 @@
 #!/bin/bash
 
+if [ -z $1 ] || [ ! -d $2 ]
+then
+    echo """./down_eeg_pdf_rsheet.sh TOKEN /path/to/nda_root/network/
+Provide REDCap token and /path/to/nda_root/network folder"""
+    exit
+fi
+
 TOKEN=$1
 # NETWORK_PHOENIX=/data/predict/data_from_nda/Pronet
 NETWORK_PHOENIX=$2/PHOENIX/PROTECTED/
