@@ -402,8 +402,8 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
                         target='_blank'),
                     html.Br(),
                     html.Br(),
-                    html.A('PDF Sheet',
-                        href=d.replace(ROOTDIR,URL_PREFIX)+f'/{sub}_{ses}_runSheet.txt',
+                    html.A('PDF',
+                        href=d.replace(ROOTDIR,URL_PREFIX)+f'/{sub}_{ses}_runSheet.pdf',
                         target='_blank')
                 ])]+ \
                 [html.Td([
