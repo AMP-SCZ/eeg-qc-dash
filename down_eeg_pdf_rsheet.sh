@@ -53,7 +53,7 @@ do
             rm $outfile
         fi
         
-        echo ''
+        echo
 
     done
     
