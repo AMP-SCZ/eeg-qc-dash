@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# cron job at every 3 am
+# 3 * * * * ~/eeg-qc-dash/backup_scores.cron
+
+datestamp=$(date +"%Y%m%d")
+
+for d in /data/predict/data_from_nda/ /data/predict/kcho/flow_test/spero
+do
+    cd $d
+    gzip -c .scores.pkl > .scores.pkl.${datestamp}.gz
+done

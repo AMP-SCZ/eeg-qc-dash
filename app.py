@@ -66,7 +66,7 @@ score_options=[
 
 app.layout= html.Div(
     children= [
-        html.Details([html.Summary('Hide introduction'),
+        html.Details([html.Summary('Collapse/Expand Introduction'),
         html.Br(),
         dbc.Row([
             dbc.Col(html.Img(src='https://avatars.githubusercontent.com/u/75388309?s=400&u=0d32212fdb2b3bf3854ed6624ce9f011ca6de29c&v=4', id='ampscz'),width=2),
@@ -93,10 +93,14 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 ])
             ])
         ])], open=True),
-        # html.Hr(),
         html.Br(),
 
-        dbc.Navbar(html.Div(id='avg-table'),
+
+        dbc.Navbar(
+            html.Details([html.Summary('Collapse/Expand Averages'),
+            html.Br(),
+            html.Div(id='avg-table')
+            ]),
             sticky='top',
             color='white'
         ),
@@ -129,7 +133,9 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             ),
 
             # technician filter
-            dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
+            dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True)),
+                width=1
+            ),
 
             # row order
             dbc.Col(html.Div([dcc.Dropdown(id='sort-order', className='ddown',
@@ -145,13 +151,13 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 # options=list(suffixes.keys()),
                 # value=[s for s,d in suffixes.items() if d],
                 multi=True)),
-                width=3
+                width=5
             ),
 
             # QC score filter
             dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
                 options=score_options)),
-                width=2
+                width=1
             ),
 
             # filter button
@@ -189,9 +195,6 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
 
 props_file= pjoin(ROOTDIR,'.scores.pkl')
-click_record= pjoin(ROOTDIR,'.click')
-with open(click_record,'w') as f:
-    f.write('-1')
 
 
 # set default dates only at initial callback
@@ -219,6 +222,7 @@ def set_dates(click):
 
 @app.callback([Output('table','children'),
     Output('properties','data'),
+    Output('avg-table','children'),
     Output('loading','children')],
     [Input('start','value'), Input('end','value'),
     Input('site','value'),
@@ -229,22 +233,14 @@ def set_dates(click):
     Input('global-filter', 'n_clicks')])
 def render_table(start, end, site, qcimg, score, tech, order, click):
     
-    # trigger initial callback but condition future callbacks on click
-    with open(click_record) as f:
-        old_click= int(f.read())
-
-    # print(f'click {click} , old_click {old_click}')
-
-    if click==old_click:
+    changed = [p['prop_id'] for p in callback_context.triggered][0]
+    if 'global-filter' not in changed or not qcimg:
         raise PreventUpdate
-    else:
-        with open(click_record,'w') as f:
-            f.write(str(click))
-            
 
     print('executing render_table')
     # strict glob pattern to avoid https://github.com/AMP-SCZ/eeg-qc-dash/issues/17
     dirs= glob(pjoin(ROOTDIR,'*/PHOENIX/PROTECTED/*/processed/*/eeg/*/Figures'))
+    dirs_all= dirs.copy()
     keys=[]
     for d in dirs:
         if order=='Alphabetical':
@@ -340,6 +336,12 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
             props= pickle.load(f)
 
     
+    qcimg2={}
+    for group in qcimg:
+        for q in group.split('|'):
+            qcimg2[q]=''
+    qcimg=list(qcimg2.keys())
+
     headers= ['Index','Subject','Session','QC Score']+ qcimg
     head= [html.Tr([html.Th(h) for h in headers])]
     body=[]
@@ -350,7 +352,6 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         sub= parts[-4]
         ses= parts[-2].split('-')[1]
         sub_ses= f'{sub}_{ses}'
-        imgs= glob(f'{d}/*[!QC].png')
        
         # initialize scores 
         if f'{sub}_{ses}' not in props:
@@ -365,22 +366,23 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         if 'avg' in d:
             continue
 
+
+        imgs= glob(f'{d}/*[!QC].png')
         # filter by columns
-        if qcimg:
-            imgs2=[]
-            for q in qcimg:
-                found=0
-                for img in imgs:
-                    if img.endswith(f'{q}.png'):
-                        imgs2.append(img)
-                        found=1
-                        break
+        imgs2=[]
+        for q in qcimg:
+            found=0
+            for img in imgs:
+                if img.endswith(f'{q}.png'):
+                    imgs2.append(img)
+                    found=1
+                    break
 
-                # render empty column for nonexistent images
-                if not found:
-                    imgs2.append('')
+            # render empty column for nonexistent images
+            if not found:
+                imgs2.append('')
 
-            imgs= imgs2.copy()
+        imgs= imgs2.copy()
  
         # print(imgs)
         
@@ -389,10 +391,21 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         # it is placed inside the for loop to take advantage of sub_ses
         if score is not None and props[f'{sub}_{ses}']!=score:
             continue
- 
+
+        # example run sheet:
+        # PHOENIX/PROTECTED/PronetWU/processed/WU01590/eeg/ses-20220921/Figures/WU01590_20220921_runSheet.txt
         body.append(
             html.Tr(
-                [html.Td(i), html.Td(sub), html.Td(ses)]+ \
+                [html.Td(i), html.Td(sub), html.Td([
+                    html.A(ses,
+                        href=d.replace(ROOTDIR,URL_PREFIX)+f'/{sub}_{ses}_runSheet.txt',
+                        target='_blank'),
+                    html.Br(),
+                    html.Br(),
+                    html.A('PDF',
+                        href=d.replace(ROOTDIR,URL_PREFIX)+f'/{sub}_{ses}_runSheet.pdf',
+                        target='_blank')
+                ])]+ \
                 [html.Td([
                     dcc.Dropdown(value=props[sub_ses],
                         id= {'sub_ses':sub_ses},
@@ -417,15 +430,97 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         i+=1
  
 
-    with open(props_file,'wb') as f:
-        pickle.dump(props,f)
-
     table=dbc.Table([html.Thead(head),html.Tbody(body)],
         bordered=True,
         hover=True)
 
-    return table,props,True
 
+    # populate avg-table
+    # reset dirs
+    dirs= dirs_all.copy()
+    # we need only these rows, so filter now to preserve order
+    subjects=['GRANavg']
+    if site:
+        subjects.append(f'{site}avg')
+
+    dirs2=[]
+    for s in subjects:
+        for d in dirs:
+            if s in d:
+                dirs2.append(d)
+                break
+    
+    dirs= dirs2.copy()
+    
+
+    # sticky-top table
+    headers= ['Index','Subject','Session','QC Score']+ qcimg
+    head= [html.Tr([html.Th(h) for h in headers])]
+    body=[]
+    i=1
+    for d in dirs:
+        parts= d.split('/')
+        sub= parts[-4]
+        ses= parts[-2].split('-')[1]
+        sub_ses= f'{sub}_{ses}'
+        imgs= glob(f'{d}/*[!QC].png')
+                
+        # filter by columns
+        imgs2=[]
+        for q in qcimg:
+            found=0
+            for img in imgs:
+                if img.endswith(f'{q}.png'):
+                    imgs2.append(img)
+                    found=1
+                    break
+
+            # render empty column for nonexistent images
+            if not found:
+                imgs2.append('')
+
+        imgs= imgs2.copy()
+        
+        # print(imgs)
+
+        body.append(
+            html.Tr(
+                [html.Td(i), html.Td(sub), html.Td(ses)]+ \
+                [html.Td([
+                    dcc.Dropdown(
+                        value=props[sub_ses],
+                        id= {'sub_ses':sub_ses},
+                        options= score_options),
+                    dcc.Textarea(
+                        value=props[sub_ses+'-1'],
+                        id= {'sub_ses-1':sub_ses},
+                        placeholder='comment',
+                        rows=30,cols=20)
+                    ])]+ \
+                [html.Td(
+                    html.A(
+                        html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
+                            width='100%',height='auto'
+                        ),
+                        href=img.replace(ROOTDIR,URL_PREFIX),
+                        target='_blank'
+                    )
+                ) for img in imgs]
+            )
+        )
+
+        i+=1
+
+
+    avg_table=dbc.Table([html.Thead(head),html.Tbody(body)],
+        bordered=True,
+        hover=True)
+
+    # finally, save all scores for future callback of render_table
+    with open(props_file,'wb') as f:
+        pickle.dump(props,f)
+
+    return table,props,avg_table,True
 
 
 @app.callback(Output('last-saved','children'),
@@ -461,130 +556,7 @@ def save_data(click,scores,comments,ids,props):
         pickle.dump(props,f)
   
 
-    return 'Last saved on '+ datetime.now().ctime()
-
-
-
-@app.callback(Output('avg-table','children'),
-    [Input('site','value'),
-    Input('qcimg','value'),
-    Input('global-filter', 'n_clicks')])
-def render_avg_table(site, qcimg, click):
-
-    # trigger initial callback but condition future callbacks on click
-    with open(click_record) as f:
-        old_click= int(f.read())
-
-    # print(f'click {click} , old_click {old_click}')
-
-    if click==old_click:
-        raise PreventUpdate
-
-
-    # if we do not glob, finding dirs would be difficult
-    # because of Pronet/Prescient ramification
-    dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
-
-    # we need only these rows, so filter now to preserve order
-    subjects=['GRANavg']
-    if site:
-        subjects.append(f'{site}avg')
-
-    dirs2=[]
-    for s in subjects:
-        for d in dirs:
-            if s in d:
-                dirs2.append(d)
-                break
-    
-    dirs= dirs2.copy()
-    
-    # print(dirs)
-
-    if not isfile(props_file):
-        # initialize scores
-        props={}
-    else:
-        # load scores
-        with open(props_file,'rb') as f:
-            props= pickle.load(f)
-
-
-    # sticky-top table
-    headers= ['Index','Subject','Session','QC Score']+ qcimg
-    head= [html.Tr([html.Th(h) for h in headers])]
-    body=[]
-    i=1
-    for d in dirs:
-        parts= d.split('/')
-        sub= parts[-4]
-        ses= parts[-2].split('-')[1]
-        sub_ses= f'{sub}_{ses}'
-        imgs= glob(f'{d}/*[!QC].png')
-        
-        # initialize scores
-        if f'{sub}_{ses}' not in props:
-            # score
-            props[sub_ses]=-9
-            # comment
-            props[sub_ses+'-1']=''
-        
-        # filter by columns
-        if qcimg:
-            imgs2=[]
-            for q in qcimg:
-                found=0
-                for img in imgs:
-                    if img.endswith(f'{q}.png'):
-                        imgs2.append(img)
-                        found=1
-                        break
-
-                # render empty column for nonexistent images
-                if not found:
-                    imgs2.append('')
-
-            imgs= imgs2.copy()
-        
-        # print(imgs)
-
-        body.append(
-            html.Tr(
-                [html.Td(i), html.Td(sub), html.Td(ses)]+ \
-                [html.Td([
-                    dcc.Dropdown(
-                        value=props[sub_ses],
-                        id= {'sub_ses':sub_ses},
-                        options= score_options),
-                    dcc.Textarea(
-                        value=props[sub_ses+'-1'],
-                        id= {'sub_ses-1':sub_ses},
-                        placeholder='comment',
-                        rows=30,cols=20)
-                    ])]+ \
-                [html.Td(
-                    html.A(
-                        html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
-                            width='100%',height='auto'
-                        ),
-                        href=img.replace(ROOTDIR,URL_PREFIX),
-                        target='_blank'
-                    )
-                ) for img in imgs]
-            )
-        )
-
-        i+=1
-
-
-
-    table=dbc.Table([html.Thead(head),html.Tbody(body)],
-        bordered=True,
-        hover=True)
-
-
-    return table
-    
+    return 'Last saved on '+ datetime.now().ctime() 
 
 
 if __name__=='__main__':
