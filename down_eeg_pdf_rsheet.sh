@@ -21,18 +21,41 @@ do
     then
         continue 1
     fi
-    echo $outfile
 
-    break 1
 
-    DATA="token=${TOKEN}&content=pdf&record=${sub}&event=baseline_arm_1&instrument=eeg_run_sheet&returnFormat=json"
+    for arm in baseline_arm_1 baseline_arm_2 month_2_arm_1 month_2_arm_2
+    do
 
-    $CURL -H "Content-Type: application/x-www-form-urlencoded" \
-          -H "Accept: application/json" \
-          -X POST \
-          -d $DATA \
-          -o $outfile \
-          https://redcap.partners.org/redcap/api/
+        # no need to download one run sheet twice
+        if [ -f $outfile ]
+        then
+            continue 1
+        fi
+
+        echo Downloading $arm $outfile
+
+        DATA="token=${TOKEN}&content=pdf&record=${sub}&event=${arm}&instrument=eeg_run_sheet&returnFormat=json"
+
+        $CURL -H "Content-Type: application/x-www-form-urlencoded" \
+              -H "Accept: application/json" \
+              -X POST \
+              -d $DATA \
+              -o $outfile \
+              https://redcap.partners.org/redcap/api/
+
+        read -ra parts <<< `du $outfile`
+        pdf_size=${parts[0]}
+
+        # criterion for finding empty PDF run sheets
+        if [[ $pdf_size == '84' ]]
+        then
+            # remove it so the valid arm can get downloaded
+            rm $outfile
+        fi
+        
+        echo ''
+
+    done
     
 done
 
