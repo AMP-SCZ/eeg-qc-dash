@@ -54,7 +54,11 @@ do
         pdf_size=${parts[0]}
 
         # criterion for finding empty PDF run sheets
-        if [[ $pdf_size == '84' ]]
+        # proper run sheet size is 156K
+        # empty run sheet size is 84K (EEG nonexistent in arm)
+        # broken run sheet size is 24K (subject nonexistent in REDCap)
+        # if [[ $pdf_size == '84' ]]
+        if [ $((pdf_size)) -lt 100 ]
         then
             # remove it so the valid arm can get downloaded
             rm $outfile
