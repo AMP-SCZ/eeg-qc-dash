@@ -5,4 +5,6 @@
 
 Billah, Tashrif; Bouix, Sylvain; Nicholas, Spero; Mathalon, Daniel; Light, Gregory;
 Plotly/Dash based web application for checking quality of EEGs,
-2022, DOI: 10.5281/zenodo.6326487
+https://github.com/AMP-SCZ/eeg-qc-dash/, 2022, DOI: 10.5281/zenodo.6326487
+
+
