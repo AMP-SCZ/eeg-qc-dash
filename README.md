@@ -44,9 +44,10 @@ cd ~/eegqc-dash/
 ```
 
 Afterward, while it is just `./app.py` for Flask, uWSGI has a bit of intricate method for launching the app.
+It can be done in two way.
 
 
-### Launch uwsgi-nginx in http protocol
+### 1. Launch uwsgi-nginx in http protocol
 
 In this method, Nginx speaks http protocol to uWSGI. It can be slow.
 
@@ -66,14 +67,14 @@ And uWSGI server was launched as follows:
 
 
 
-### Launch uwsgi-nginx in wsgi protocol
+### 2. Launch uwsgi-nginx in wsgi protocol
 
 In this method, Nginx speaks wsgi protocol to uWSGI. It is fast.
 
 References: [digitalocean](https://www.digitalocean.com/community/tutorials/how-to-set-up-uwsgi-and-nginx-to-serve-python-apps-on-ubuntu-14-04)
 and [uwsgi-docs](https://uwsgi-docs.readthedocs.io/en/latest/Nginx.html#configuring-nginx)
 
-#### Using port (slower)
+#### i. Using port (slower)
 
 ```cfg
     location /eegqc/ {
@@ -84,7 +85,7 @@ and [uwsgi-docs](https://uwsgi-docs.readthedocs.io/en/latest/Nginx.html#configur
 
 > $ uwsgi --socket :8050 --wsgi-file wsgi.py --master --processes 1 --threads 1
 
-#### Using socket (fastest)
+#### ii. Using socket (fastest)
 
 
 ```cfg
