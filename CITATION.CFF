@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "Please cite as below."
+authors:
+- family-names: "Billah"
+  given-names: "Tashrif"
+- family-names: "Bouix"
+  given-names: "Sylvain"
+- family-names: "Nicholas"
+  given-names: "Spero"
+- family-names: "Mathalon"
+  given-names: "Daniel"
+- family-names: "Light"
+  given-names: "Gregory"
+title: "Plotly/Dash based web application for checking quality of EEGs"
+version: 1.0
+doi: 10.5281/zenodo.6326487
+date-released: 2022-03-03
+url: "https://github.com/AMP-SCZ/eeg-qc-dash/"
