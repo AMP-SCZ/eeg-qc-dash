@@ -11,7 +11,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash/, 2022, DOI: 10.5281/zenodo.6326487
 ### Flask vs uWSGI server
 
 We have had many app crashes. We attributed the crashes to the development server Plotly uses as default: Flask.
-Hence, we took up the task of installing uWSGI server. These changes were necessary for a Dash app to run via a uWSGI server.
+Hence, we took up the task of installing uWSGI server. **These changes** were necessary for a Dash app to run via a uWSGI server.
 The app visibly runs faster through uWSGI server as expected.
 
 
