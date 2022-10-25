@@ -8,6 +8,12 @@ Plotly/Dash based web application for checking quality of EEGs,
 https://github.com/AMP-SCZ/eeg-qc-dash/, 2022, DOI: 10.5281/zenodo.6326487
 
 
+### Flask vs uWSGI server
+
+We have had many app crashes. We attributed the crashes to the development server Plotly uses as default: Flask.
+Hence, we took up the task of installing uWSGI server. These changes were necessary for a Dash app to run via a uWSGI server.
+The app visibly runs faster through uWSGI server as expected.
+
 
 uWSGI was installed according to [official documentation](https://uwsgi-docs.readthedocs.io/en/latest/WSGIquickstart.html):
 
@@ -24,13 +30,20 @@ The latter does not have one dynamic library that is required to link with uWSGI
 Accordingly, you should run `pip install -r eeg-qc-dash/requirements.txt` on the main Python.
 
 
+### Environment
+
+Regardless of Flask or uWSGI server, the following environment variables are defined on the terminal:
+
+```bash
 export DASH_DEBUG=False
 export DASH_URL_BASE_PATHNAME=/eegqc/
 export EEG_QC_PHOENIX=/data/predict/data_from_nda/
 export PATH=~/uwsgi-2.0.20/:~/miniconda3/bin/:$PATH
 export PYTHONHOME=~/mininconda3/
 cd ~/eegqc-dash/
+```
 
+Afterward, while it is just `./app.py` for Flask, uWSGI has a bit of intricate method for launching the app.
 
 
 ### Launch uwsgi-nginx in http protocol
