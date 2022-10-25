@@ -9,6 +9,22 @@ https://github.com/AMP-SCZ/eeg-qc-dash/, 2022, DOI: 10.5281/zenodo.6326487
 
 
 
+uWSGI was installed according to [official documentation](https://uwsgi-docs.readthedocs.io/en/latest/WSGIquickstart.html):
+
+```bash
+wget https://projects.unbit.it/downloads/uwsgi-latest.tar.gz
+tar -zxvf uwsgi-latest.tar.gz
+cd uwsgi-*
+export PATH=~/miniconda3/bin/:$PATH
+make
+```
+
+Notice that we used the main Python for uWSGI install, not an environment Python.
+The latter does not have one dynamic library that is required to link with uWSGI.
+Accordingly, you should run `pip install -r eeg-qc-dash/requirements.txt` on the main Python.
+
+
+export DASH_DEBUG=False
 export DASH_URL_BASE_PATHNAME=/eegqc/
 export EEG_QC_PHOENIX=/data/predict/data_from_nda/
 export PATH=~/uwsgi-2.0.20/:~/miniconda3/bin/:$PATH
@@ -38,6 +54,8 @@ In this method, Nginx speaks http protocol to uWSGI. It can be slow.
 
 ### Launch uwsgi-nginx in wsgi protocol
 
+In this method, Nginx speaks wsgi protocol to uWSGI. It is fast.
+
 References: [digitalocean](https://www.digitalocean.com/community/tutorials/how-to-set-up-uwsgi-and-nginx-to-serve-python-apps-on-ubuntu-14-04)
 and [uwsgi-docs](https://uwsgi-docs.readthedocs.io/en/latest/Nginx.html#configuring-nginx)
 
@@ -55,6 +73,7 @@ and [uwsgi-docs](https://uwsgi-docs.readthedocs.io/en/latest/Nginx.html#configur
 #### Using socket (fastest)
 
 The following section was added to `/etc/nginx.conf`:
+
 ```cfg
     location /eegqc/ {
       include uwsgi_params;
@@ -64,9 +83,7 @@ The following section was added to `/etc/nginx.conf`:
 
 And uWSGI server was launched as follows:
 
-```bash
-uwsgi --socket /run/uwsgi.sock --wsgi-file uwsgi.py --master --processes 1 --chmod-socket=666
-```
+> $ uwsgi --socket /run/uwsgi.sock --wsgi-file uwsgi.py --master --processes 1 --chmod-socket=666
 
 
 `/tmp/uwsgi.sock` could not be discovered by Nginx apparently because of [this](https://serverfault.com/a/464025) issue.
