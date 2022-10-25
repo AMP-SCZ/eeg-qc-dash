@@ -20,6 +20,9 @@ import json
 
 from subprocess import check_call
 
+from flask import Flask
+server=Flask(__name__)
+
 SCRIPTDIR=dirname(abspath(__file__))
 
 # initial list of Figures
@@ -30,7 +33,7 @@ if not ROOTDIR:
     exit(1)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP,'styles.css']
-app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG QC', assets_folder=ROOTDIR, assets_url_path="/")
+app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG QC', assets_folder=ROOTDIR, assets_url_path="/",server=server)
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
