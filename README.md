@@ -50,16 +50,17 @@ Afterward, while it is just `./app.py` for Flask, uWSGI has a bit of intricate m
 
 In this method, Nginx speaks http protocol to uWSGI. It can be slow.
 
-#### nginx.conf
+The following section was added to `/etc/nginx.conf`:
+
 ```cfg
     location /eegqc/ {
       proxy_pass http://localhost:8050/;
     }
 ```
 
-#### uwsgi
+And uWSGI server was launched as follows:
 
-> uwsgi --http :8050 --wsgi-file wsgi.py --master --processes 1 --threads 1
+> $ uwsgi --http :8050 --wsgi-file wsgi.py --master --processes 1 --threads 1
 
 
 
@@ -85,7 +86,6 @@ and [uwsgi-docs](https://uwsgi-docs.readthedocs.io/en/latest/Nginx.html#configur
 
 #### Using socket (fastest)
 
-The following section was added to `/etc/nginx.conf`:
 
 ```cfg
     location /eegqc/ {
@@ -94,7 +94,6 @@ The following section was added to `/etc/nginx.conf`:
     }
 ```
 
-And uWSGI server was launched as follows:
 
 > $ uwsgi --socket /run/uwsgi.sock --wsgi-file uwsgi.py --master --processes 1 --chmod-socket=666
 
