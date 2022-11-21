@@ -100,7 +100,7 @@ and [uwsgi-docs](https://uwsgi-docs.readthedocs.io/en/latest/Nginx.html#configur
 
 
 `/tmp/uwsgi.sock` could not be discovered by Nginx apparently because of [this](https://serverfault.com/a/464025) issue.
-So we used `/run/uwsgi.sock`. Now it could be discovered ut SELinux prevented Nginx from writing into it:
+So we used `/run/uwsgi.sock`. Now it could be discovered but SELinux prevented Nginx from writing into it:
 
 ```bash
 $ tail -f /var/log/messages
