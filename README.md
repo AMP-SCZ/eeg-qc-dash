@@ -30,6 +30,39 @@ The latter does not have one dynamic library that is required to link with uWSGI
 Accordingly, you should run `pip install -r eeg-qc-dash/requirements.txt` on the main Python.
 
 
+<details><summary>Build Python</summary>
+
+In a new VM, even the main Python 3.9 did not come with `lib/libpython3.9.a`. So we had to build Python 3.9 from source
+following https://docs.python.org/3/using/unix.html#building-python :
+
+```bash
+# as root
+yum install libffi-devel libxml2-devel
+
+# as non-root
+wget https://www.python.org/ftp/python/3.9.11/Python-3.9.11.tgz
+tar -zxvf Python-3.9.11.tgz
+cd Python-3.9.11
+./configure --prefix=`pwd`
+make
+make install
+
+# create soft links
+cd bin
+ln -s python3.9 python
+ln -s pip3 pip
+cd ..
+
+# make python3 available in PATH
+export PATH=`pwd`/bin/:$PATH
+export PYTHONHOME=`pwd`
+```
+
+Then uWSGI was built as above. `pip install -r eeg-qc-dash/requirements.txt` was also installed in this Python.
+
+</details>
+
+
 ### Environment
 
 Regardless of Flask or uWSGI server, the following environment variables are defined on the terminal:
@@ -40,7 +73,7 @@ export DASH_URL_BASE_PATHNAME=/eegqc/
 export EEG_QC_PHOENIX=/data/predict/data_from_nda/
 export PATH=~/uwsgi-2.0.20/:~/miniconda3/bin/:$PATH
 export PYTHONHOME=~/mininconda3/
-cd ~/eegqc-dash/
+cd ~/eeg-qc-dash/
 ```
 
 Afterward, while it is just `./app.py` for Flask, uWSGI has a bit of intricate method for launching the app.
