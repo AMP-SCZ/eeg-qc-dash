@@ -9,4 +9,5 @@ for d in /data/predict/data_from_nda/ /data/predict/kcho/flow_test/spero
 do
     cd $d
     gzip -c .scores.pkl > .scores.pkl.${datestamp}.gz
+    chmod g+w .scores.pkl.${datestamp}.gz
 done
