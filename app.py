@@ -37,17 +37,6 @@ app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callbac
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-# suffixes= {
-#     '_QCcounts':1,
-#     '_QCimg':1,
-#     '_QCimpedance':1,
-#     '_QClineNoise':1,
-#     '_QCbridge.png':0,
-#     '_QCresponseAccuracy':1,
-#     '_QCrestAlpha':1,
-#     '_QCresponseTime':0
-# }
-
 
 with open('sites.json') as f:
     sites= json.load(f)
@@ -135,6 +124,13 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 width=2
             ),
 
+            # password for site
+            dbc.Col(html.Div(dcc.Input(id='passwd',placeholder='password',
+                type='password',
+                debounce=True)),
+                width=2
+            ),
+
             # technician filter
             dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True)),
                 width=1
@@ -167,6 +163,8 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0))
             
         ]),
+
+        dbc.Row(dcc.ConfirmDialog(id='verify', message='Invalid password for the site, try again')),
         
         html.Br(),
         dcc.Loading(html.Div(id='loading'),type='cube'),
@@ -198,6 +196,28 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
 
 props_file= pjoin(ROOTDIR,'.scores.pkl')
+_passwd=pd.read_csv('.passwd')
+_passwd.set_index('site',inplace=True)
+
+
+# verify password
+@app.callback(Output('verify','displayed'),
+       [Input('site','value'),
+       Input('passwd','value')])
+def verify_passwd(site,passwd):
+
+    if not (site and passwd):
+        raise PreventUpdate
+
+    if passwd==_passwd.loc['dpacc','passwd']:
+        pass
+    elif passwd==_passwd.loc[site,'passwd']:
+        pass
+    else:
+        # return f'Invalid password for site {site}, try again'
+        return True
+
+    return False
 
 
 # set default dates only at initial callback
@@ -233,12 +253,22 @@ def set_dates(click):
     Input('score','value'),
     Input('tech','value'),
     Input('sort-order','value'),
-    Input('global-filter', 'n_clicks')])
-def render_table(start, end, site, qcimg, score, tech, order, click):
+    Input('global-filter', 'n_clicks'),
+    Input('passwd','value')])
+def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
     
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     if 'global-filter' not in changed or not qcimg:
         raise PreventUpdate
+
+    # verify password
+    if passwd==_passwd.loc['dpacc','passwd']:
+        pass
+    elif passwd==_passwd.loc[site,'passwd']:
+        pass
+    else:
+        raise PreventUpdate
+
 
     print('executing render_table')
     # strict glob pattern to avoid https://github.com/AMP-SCZ/eeg-qc-dash/issues/17
