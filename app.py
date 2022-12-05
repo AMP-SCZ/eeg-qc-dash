@@ -128,7 +128,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             dbc.Col(html.Div(dcc.Input(id='passwd',placeholder='password',
                 type='password',
                 debounce=True)),
-                width=2
+                width=1
             ),
 
             # technician filter
@@ -145,18 +145,18 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 width=1
             ),
 
+            # QC score filter
+            dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
+                options=score_options)),
+                width=1
+            ),
+
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
                 # options=list(suffixes.keys()),
                 # value=[s for s,d in suffixes.items() if d],
                 multi=True)),
                 width=5
-            ),
-
-            # QC score filter
-            dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
-                options=score_options)),
-                width=1
             ),
 
             # filter button
