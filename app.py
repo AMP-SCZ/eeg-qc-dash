@@ -142,21 +142,23 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 value='Latest first'),
                 'Sort order'
                 ]),
-                width=1
+                width=2
             ),
 
             # QC score filter
             dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
                 options=score_options)),
                 width=1
-            ),
+            )
+        ]),
 
+        dbc.Row([
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
                 # options=list(suffixes.keys()),
                 # value=[s for s,d in suffixes.items() if d],
                 multi=True)),
-                width=5
+                width=8
             ),
 
             # filter button
