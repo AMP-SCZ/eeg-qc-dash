@@ -208,16 +208,25 @@ _passwd.set_index('site',inplace=True)
        Input('passwd','value')])
 def verify_passwd(site,passwd):
 
-    if not (site and passwd):
-        raise PreventUpdate
+    if site and passwd:
+        if passwd==_passwd.loc['dpacc','passwd']:
+            pass
+        elif passwd==_passwd.loc[site,'passwd']:
+            pass
+        else:
+            # return f'Invalid password for site {site}, try again'
+            return True
 
-    if passwd==_passwd.loc['dpacc','passwd']:
-        pass
-    elif passwd==_passwd.loc[site,'passwd']:
-        pass
+    elif not site and passwd:
+        if passwd==_passwd.loc['dpacc','passwd']:
+            pass
+        else:
+            # return f'Invalid password for site {site}, try again'
+            return True
+
     else:
-        # return f'Invalid password for site {site}, try again'
-        return True
+        raise PreventUpdate
+        
 
     return False
 
@@ -260,7 +269,7 @@ def set_dates(click):
 def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
     
     changed = [p['prop_id'] for p in callback_context.triggered][0]
-    if 'global-filter' not in changed or not qcimg:
+    if ('global-filter' not in changed) or (not qcimg) or (not passwd):
         raise PreventUpdate
 
     # verify password
@@ -572,11 +581,6 @@ def save_data(click,scores,comments,ids,props):
 
     print('executing save_data')
     
-    # even after filtering, props contain all scores
-    # so loading of all scores from file is not required
-    # load all scores 
-    # with open(props_file,'rb') as f:
-    #     props_all= pickle.load(f)
     
     # update changed scores
     for n,s,c in zip(ids,scores,comments):
