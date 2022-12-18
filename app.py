@@ -269,7 +269,7 @@ def set_dates(click):
 def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
     
     changed = [p['prop_id'] for p in callback_context.triggered][0]
-    if ('global-filter' not in changed) or (not qcimg) or (not passwd):
+    if not ('global-filter' in changed and qcimg and passwd):
         raise PreventUpdate
 
     # verify password
@@ -576,7 +576,7 @@ def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
 def save_data(click,scores,comments,ids,props):
 
     changed = [p['prop_id'] for p in callback_context.triggered][0]
-    if 'save' not in changed:
+    if not ('save' in changed and props):
         raise PreventUpdate
 
     print('executing save_data')
