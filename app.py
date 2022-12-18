@@ -560,9 +560,11 @@ def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
         bordered=True,
         hover=True)
 
-    # finally, save all scores for future callback of render_table
-    with open(props_file,'wb') as f:
-        pickle.dump(props,f)
+    # I cannot think of a reason why saving scores at each click of Filter is useful!
+    # Because of how app.py has evolved to the current state,
+    # here we save the same scores that we loaded up there.
+    # with open(props_file,'wb') as f:
+    #     pickle.dump(props,f)
 
     return table,props,avg_table,True
 
