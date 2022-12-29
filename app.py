@@ -37,6 +37,7 @@ app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callbac
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
+ALT_IMG=pjoin(URL_PREFIX,'blank.png')
 
 with open('sites.json') as f:
     sites= json.load(f)
@@ -424,7 +425,7 @@ def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
 
             # render empty column for nonexistent images
             if not found:
-                imgs2.append('')
+                imgs2.append(ALT_IMG)
 
         imgs= imgs2.copy()
  
@@ -521,7 +522,7 @@ def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
 
             # render empty column for nonexistent images
             if not found:
-                imgs2.append('')
+                imgs2.append(ALT_IMG)
 
         imgs= imgs2.copy()
         
