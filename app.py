@@ -574,8 +574,9 @@ def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
     Input({'sub_ses':ALL},'value'),
     Input({'sub_ses-1':ALL},'value'),
     Input({'sub_ses':ALL},'id'),
-    Input('properties','data')])
-def save_data(click,scores,comments,ids,props):
+    Input('properties','data'),
+    Input('passwd','value')])
+def save_data(click,scores,comments,ids,props,passwd):
 
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     if not ('save' in changed and props):
@@ -592,12 +593,14 @@ def save_data(click,scores,comments,ids,props):
 
     # print(props)
 
-    # save all scores
-    with open(props_file,'wb') as f:
-        pickle.dump(props,f)
-  
+    # only let DPACC save scores
+    if passwd==_passwd.loc['dpacc','passwd']:
+        with open(props_file,'wb') as f:
+            pickle.dump(props,f)
 
-    return 'Last saved on '+ datetime.now().ctime() 
+        return 'Last saved on '+ datetime.now().ctime()
+    else:
+        return('Only DPACC users can save scores!')
 
 
 if __name__=='__main__':
