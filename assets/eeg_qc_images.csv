@@ -2,7 +2,7 @@ img,default
 _QCcounts|_QCimg|_QCimpedance|_QClineNoise|_QCbridge|_QCresponseAccuracy|_QCrestAlpha|_QCresponseTime|_QCinterp,1
 _AODbutterflyStd|_AODbutterflyTrg|_AODbutterflyNov|_AODPzTrg|_AODCzNov|_AODTopoTrg|_AODTopoNov,0
 _VODbutterflyStd|_VODbutterflyTrg|_VODbutterflyNov|_VODPzTrg|_VODCzNov|_VODTopoTrg|_VODTopoNov,0
-_MMNbutterflyStd|_MMNbutterflyDev|_MMNFCzDev|_MMNTopoDev|_ASSR,0
+_MMNbutterflyStd|_MMNbutterflyDev|_MMNFCzDev|_MMNTopoDev|_ASSR_P7P8,0
 _QCcounts,0
 _QCimg,0
 _QCimpedance,0
@@ -30,4 +30,4 @@ _MMNbutterflyStd,0
 _MMNbutterflyDev,0
 _MMNFCzDev,0
 _MMNTopoDev,0
-_ASSR,0
+_ASSR_P7P8,0
