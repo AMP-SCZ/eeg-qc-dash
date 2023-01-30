@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# cron job at every 3 am
+# 0 3 * * * /path/to/eeg-qc-dash/backup_scores.cron
+
+datestamp=$(date +"%Y%m%d")
+
+for d in "$@"
+do
+    cd $d
+    gzip -c .scores.pkl > .scores.pkl.${datestamp}.gz
+    chmod g+w .scores.pkl.${datestamp}.gz
+done

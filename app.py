@@ -20,6 +20,9 @@ import json
 
 from subprocess import check_call
 
+from flask import Flask
+server=Flask(__name__)
+
 SCRIPTDIR=dirname(abspath(__file__))
 
 # initial list of Figures
@@ -30,21 +33,11 @@ if not ROOTDIR:
     exit(1)
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP,'styles.css']
-app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG QC', assets_folder=ROOTDIR, assets_url_path="/")
+app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG QC', assets_folder=ROOTDIR, assets_url_path="/",server=server)
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
-# suffixes= {
-#     '_QCcounts':1,
-#     '_QCimg':1,
-#     '_QCimpedance':1,
-#     '_QClineNoise':1,
-#     '_QCbridge.png':0,
-#     '_QCresponseAccuracy':1,
-#     '_QCrestAlpha':1,
-#     '_QCresponseTime':0
-# }
-
+ALT_IMG=pjoin(URL_PREFIX,'blank.png')
 
 with open('sites.json') as f:
     sites= json.load(f)
@@ -66,7 +59,7 @@ score_options=[
 
 app.layout= html.Div(
     children= [
-        html.Details([html.Summary('Hide introduction'),
+        html.Details([html.Summary('Collapse/Expand Introduction'),
         html.Br(),
         dbc.Row([
             dbc.Col(html.Img(src='https://avatars.githubusercontent.com/u/75388309?s=400&u=0d32212fdb2b3bf3854ed6624ce9f011ca6de29c&v=4', id='ampscz'),width=2),
@@ -93,10 +86,14 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 ])
             ])
         ])], open=True),
-        # html.Hr(),
         html.Br(),
 
-        dbc.Navbar(html.Div(id='avg-table'),
+
+        dbc.Navbar(
+            html.Details([html.Summary('Collapse/Expand Averages'),
+            html.Br(),
+            html.Div(id='avg-table')
+            ]),
             sticky='top',
             color='white'
         ),
@@ -128,8 +125,17 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 width=2
             ),
 
+            # password for site
+            dbc.Col(html.Div(dcc.Input(id='passwd',placeholder='password',
+                type='password',
+                debounce=True)),
+                width=1
+            ),
+
             # technician filter
-            dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True))),
+            dbc.Col(html.Div(dcc.Input(id='tech',placeholder='technician',debounce=True)),
+                width=1
+            ),
 
             # row order
             dbc.Col(html.Div([dcc.Dropdown(id='sort-order', className='ddown',
@@ -137,27 +143,31 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 value='Latest first'),
                 'Sort order'
                 ]),
-                width=1
-            ),
-
-            # column filter
-            dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
-                # options=list(suffixes.keys()),
-                # value=[s for s,d in suffixes.items() if d],
-                multi=True)),
-                width=3
+                width=2
             ),
 
             # QC score filter
             dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
                 options=score_options)),
-                width=2
+                width=1
+            )
+        ]),
+
+        dbc.Row([
+            # column filter
+            dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
+                # options=list(suffixes.keys()),
+                # value=[s for s,d in suffixes.items() if d],
+                multi=True)),
+                width=8
             ),
 
             # filter button
             dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0))
             
         ]),
+
+        dbc.Row(dcc.ConfirmDialog(id='verify', message='Invalid password for the site, try again')),
         
         html.Br(),
         dcc.Loading(html.Div(id='loading'),type='cube'),
@@ -189,9 +199,37 @@ https://github.com/AMP-SCZ/eeg-qc-dash
 
 
 props_file= pjoin(ROOTDIR,'.scores.pkl')
-click_record= pjoin(ROOTDIR,'.click')
-with open(click_record,'w') as f:
-    f.write('-1')
+_passwd=pd.read_csv('.passwd')
+_passwd.set_index('site',inplace=True)
+
+
+# verify password
+@app.callback(Output('verify','displayed'),
+       [Input('site','value'),
+       Input('passwd','value')])
+def verify_passwd(site,passwd):
+
+    if site and passwd:
+        if passwd==_passwd.loc['dpacc','passwd']:
+            pass
+        elif passwd==_passwd.loc[site,'passwd']:
+            pass
+        else:
+            # return f'Invalid password for site {site}, try again'
+            return True
+
+    elif not site and passwd:
+        if passwd==_passwd.loc['dpacc','passwd']:
+            pass
+        else:
+            # return f'Invalid password for site {site}, try again'
+            return True
+
+    else:
+        raise PreventUpdate
+        
+
+    return False
 
 
 # set default dates only at initial callback
@@ -219,6 +257,7 @@ def set_dates(click):
 
 @app.callback([Output('table','children'),
     Output('properties','data'),
+    Output('avg-table','children'),
     Output('loading','children')],
     [Input('start','value'), Input('end','value'),
     Input('site','value'),
@@ -226,25 +265,27 @@ def set_dates(click):
     Input('score','value'),
     Input('tech','value'),
     Input('sort-order','value'),
-    Input('global-filter', 'n_clicks')])
-def render_table(start, end, site, qcimg, score, tech, order, click):
+    Input('global-filter', 'n_clicks'),
+    Input('passwd','value')])
+def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
     
-    # trigger initial callback but condition future callbacks on click
-    with open(click_record) as f:
-        old_click= int(f.read())
-
-    # print(f'click {click} , old_click {old_click}')
-
-    if click==old_click:
+    changed = [p['prop_id'] for p in callback_context.triggered][0]
+    if not ('global-filter' in changed and qcimg and passwd):
         raise PreventUpdate
+
+    # verify password
+    if passwd==_passwd.loc['dpacc','passwd']:
+        pass
+    elif passwd==_passwd.loc[site,'passwd']:
+        pass
     else:
-        with open(click_record,'w') as f:
-            f.write(str(click))
-            
+        raise PreventUpdate
+
 
     print('executing render_table')
     # strict glob pattern to avoid https://github.com/AMP-SCZ/eeg-qc-dash/issues/17
     dirs= glob(pjoin(ROOTDIR,'*/PHOENIX/PROTECTED/*/processed/*/eeg/*/Figures'))
+    dirs_all= dirs.copy()
     keys=[]
     for d in dirs:
         if order=='Alphabetical':
@@ -280,7 +321,7 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
     if site:
         # example d: PHOENIX/PROTECTED/PronetLA/processed/LA00012/eeg/ses-20211118/Figures
         # prepend / to facilitiate filtering
-        # site= '/'+site
+        site= '/'+site
         dirs= [d for d in dirs if site in d]
 
 
@@ -340,6 +381,12 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
             props= pickle.load(f)
 
     
+    qcimg2={}
+    for group in qcimg:
+        for q in group.split('|'):
+            qcimg2[q]=''
+    qcimg=list(qcimg2.keys())
+
     headers= ['Index','Subject','Session','QC Score']+ qcimg
     head= [html.Tr([html.Th(h) for h in headers])]
     body=[]
@@ -350,7 +397,6 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         sub= parts[-4]
         ses= parts[-2].split('-')[1]
         sub_ses= f'{sub}_{ses}'
-        imgs= glob(f'{d}/*[!QC].png')
        
         # initialize scores 
         if f'{sub}_{ses}' not in props:
@@ -365,22 +411,23 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         if 'avg' in d:
             continue
 
+
+        imgs= glob(f'{d}/*[!QC].png')
         # filter by columns
-        if qcimg:
-            imgs2=[]
-            for q in qcimg:
-                found=0
-                for img in imgs:
-                    if img.endswith(f'{q}.png'):
-                        imgs2.append(img)
-                        found=1
-                        break
+        imgs2=[]
+        for q in qcimg:
+            found=0
+            for img in imgs:
+                if img.endswith(f'{q}.png'):
+                    imgs2.append(img)
+                    found=1
+                    break
 
-                # render empty column for nonexistent images
-                if not found:
-                    imgs2.append('')
+            # render empty column for nonexistent images
+            if not found:
+                imgs2.append(ALT_IMG)
 
-            imgs= imgs2.copy()
+        imgs= imgs2.copy()
  
         # print(imgs)
         
@@ -389,10 +436,21 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         # it is placed inside the for loop to take advantage of sub_ses
         if score is not None and props[f'{sub}_{ses}']!=score:
             continue
- 
+
+        # example run sheet:
+        # PHOENIX/PROTECTED/PronetWU/processed/WU01590/eeg/ses-20220921/Figures/WU01590_20220921_runSheet.txt
         body.append(
             html.Tr(
-                [html.Td(i), html.Td(sub), html.Td(ses)]+ \
+                [html.Td(i), html.Td(sub), html.Td([
+                    html.A(ses,
+                        href=d.replace(ROOTDIR,URL_PREFIX)+f'/{sub}_{ses}_runSheet.txt',
+                        target='_blank'),
+                    html.Br(),
+                    html.Br(),
+                    html.A('PDF',
+                        href=d.replace(ROOTDIR,URL_PREFIX)+f'/{sub}_{ses}_runSheet.pdf',
+                        target='_blank')
+                ])]+ \
                 [html.Td([
                     dcc.Dropdown(value=props[sub_ses],
                         id= {'sub_ses':sub_ses},
@@ -417,74 +475,14 @@ def render_table(start, end, site, qcimg, score, tech, order, click):
         i+=1
  
 
-    with open(props_file,'wb') as f:
-        pickle.dump(props,f)
-
     table=dbc.Table([html.Thead(head),html.Tbody(body)],
         bordered=True,
         hover=True)
 
-    return table,props,True
 
-
-
-@app.callback(Output('last-saved','children'),
-    [Input('save','n_clicks'),
-    Input({'sub_ses':ALL},'value'),
-    Input({'sub_ses-1':ALL},'value'),
-    Input({'sub_ses':ALL},'id'),
-    Input('properties','data')])
-def save_data(click,scores,comments,ids,props):
-
-    changed = [p['prop_id'] for p in callback_context.triggered][0]
-    if 'save' not in changed:
-        raise PreventUpdate
-
-    print('executing save_data')
-    
-    # even after filtering, props contain all scores
-    # so loading of all scores from file is not required
-    # load all scores 
-    # with open(props_file,'rb') as f:
-    #     props_all= pickle.load(f)
-    
-    # update changed scores
-    for n,s,c in zip(ids,scores,comments):
-        sub_ses= n['sub_ses']
-        props[sub_ses]=s
-        props[sub_ses+'-1']=c
-
-    # print(props)
-
-    # save all scores
-    with open(props_file,'wb') as f:
-        pickle.dump(props,f)
-  
-
-    return 'Last saved on '+ datetime.now().ctime()
-
-
-
-@app.callback(Output('avg-table','children'),
-    [Input('site','value'),
-    Input('qcimg','value'),
-    Input('global-filter', 'n_clicks')])
-def render_avg_table(site, qcimg, click):
-
-    # trigger initial callback but condition future callbacks on click
-    with open(click_record) as f:
-        old_click= int(f.read())
-
-    # print(f'click {click} , old_click {old_click}')
-
-    if click==old_click:
-        raise PreventUpdate
-
-
-    # if we do not glob, finding dirs would be difficult
-    # because of Pronet/Prescient ramification
-    dirs= glob(ROOTDIR+'/**/Figures', recursive=True)
-
+    # populate avg-table
+    # reset dirs
+    dirs= dirs_all.copy()
     # we need only these rows, so filter now to preserve order
     subjects=['GRANavg']
     if site:
@@ -499,16 +497,6 @@ def render_avg_table(site, qcimg, click):
     
     dirs= dirs2.copy()
     
-    # print(dirs)
-
-    if not isfile(props_file):
-        # initialize scores
-        props={}
-    else:
-        # load scores
-        with open(props_file,'rb') as f:
-            props= pickle.load(f)
-
 
     # sticky-top table
     headers= ['Index','Subject','Session','QC Score']+ qcimg
@@ -521,30 +509,22 @@ def render_avg_table(site, qcimg, click):
         ses= parts[-2].split('-')[1]
         sub_ses= f'{sub}_{ses}'
         imgs= glob(f'{d}/*[!QC].png')
-        
-        # initialize scores
-        if f'{sub}_{ses}' not in props:
-            # score
-            props[sub_ses]=-9
-            # comment
-            props[sub_ses+'-1']=''
-        
+                
         # filter by columns
-        if qcimg:
-            imgs2=[]
-            for q in qcimg:
-                found=0
-                for img in imgs:
-                    if img.endswith(f'{q}.png'):
-                        imgs2.append(img)
-                        found=1
-                        break
+        imgs2=[]
+        for q in qcimg:
+            found=0
+            for img in imgs:
+                if img.endswith(f'{q}.png'):
+                    imgs2.append(img)
+                    found=1
+                    break
 
-                # render empty column for nonexistent images
-                if not found:
-                    imgs2.append('')
+            # render empty column for nonexistent images
+            if not found:
+                imgs2.append(ALT_IMG)
 
-            imgs= imgs2.copy()
+        imgs= imgs2.copy()
         
         # print(imgs)
 
@@ -577,14 +557,51 @@ def render_avg_table(site, qcimg, click):
         i+=1
 
 
-
-    table=dbc.Table([html.Thead(head),html.Tbody(body)],
+    avg_table=dbc.Table([html.Thead(head),html.Tbody(body)],
         bordered=True,
         hover=True)
 
+    # I cannot think of a reason why saving scores at each click of Filter is useful!
+    # Because of how app.py has evolved to the current state,
+    # here we save the same scores that we loaded up there.
+    # with open(props_file,'wb') as f:
+    #     pickle.dump(props,f)
 
-    return table
+    return table,props,avg_table,True
+
+
+@app.callback(Output('last-saved','children'),
+    [Input('save','n_clicks'),
+    Input({'sub_ses':ALL},'value'),
+    Input({'sub_ses-1':ALL},'value'),
+    Input({'sub_ses':ALL},'id'),
+    Input('properties','data'),
+    Input('passwd','value')])
+def save_data(click,scores,comments,ids,props,passwd):
+
+    changed = [p['prop_id'] for p in callback_context.triggered][0]
+    if not ('save' in changed and props):
+        raise PreventUpdate
+
+    print('executing save_data')
     
+    
+    # update changed scores
+    for n,s,c in zip(ids,scores,comments):
+        sub_ses= n['sub_ses']
+        props[sub_ses]=s
+        props[sub_ses+'-1']=c
+
+    # print(props)
+
+    # only let DPACC save scores
+    if passwd==_passwd.loc['dpacc','passwd']:
+        with open(props_file,'wb') as f:
+            pickle.dump(props,f)
+
+        return 'Last saved on '+ datetime.now().ctime()
+    else:
+        return('Only DPACC users can save scores!')
 
 
 if __name__=='__main__':

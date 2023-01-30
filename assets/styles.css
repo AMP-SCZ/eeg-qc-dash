@@ -46,6 +46,10 @@ img {
     width: 100%;
 }
 
+#table {
+    width: fit-content;
+}
+
 summary {
     font-weight: bold;
     color: blue;
