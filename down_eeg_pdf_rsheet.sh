@@ -29,44 +29,37 @@ do
         continue 1
     fi
 
-
-    for arm in baseline_arm_1 baseline_arm_2 month_2_arm_1 month_2_arm_2
-    do
-
-        # no need to download one run sheet twice
-        if [ -f $outfile ]
-        then
-            continue 1
-        fi
-
-        echo Downloading $arm $outfile
-
-        DATA="token=${TOKEN}&content=pdf&record=${sub}&event=${arm}&instrument=eeg_run_sheet&returnFormat=json"
-
-        $CURL -H "Content-Type: application/x-www-form-urlencoded" \
-              -H "Accept: application/json" \
-              -X POST \
-              -d $DATA \
-              -o $outfile \
-              https://redcap.partners.org/redcap/api/
-
-        read -ra parts <<< `du $outfile`
-        pdf_size=${parts[0]}
-
-        # criterion for finding empty PDF run sheets
-        # proper run sheet size is 156K
-        # empty run sheet size is 84K (EEG nonexistent in arm)
-        # broken run sheet size is 24K (subject nonexistent in REDCap)
-        # if [[ $pdf_size == '84' ]]
-        if [ $((pdf_size)) -lt 100 ]
-        then
-            # remove it so the valid arm can get downloaded
-            rm $outfile
-        fi
-        
-        echo
-
-    done
     
+    # find arm
+    # _find_eeg_event.py network_directory figures_directory subject session(date)
+    arm=`/data/predict1/eeg-qc-dash/_find_eeg_event.py $2 $d $sub $ses`
+    
+
+    if [ -z $arm ]
+    then
+        echo No run sheet for $sub $ses
+        continue 1
+    fi
+
+
+    # no need to download one run sheet twice
+    if [ -f $outfile ]
+    then
+        continue 1
+    fi
+
+    echo Downloading $arm $outfile
+
+    DATA="token=${TOKEN}&content=pdf&record=${sub}&event=${arm}&instrument=eeg_run_sheet&returnFormat=json"
+
+    $CURL -H "Content-Type: application/x-www-form-urlencoded" \
+          -H "Accept: application/json" \
+          -X POST \
+          -d $DATA \
+          -o $outfile \
+          https://redcap.partners.org/redcap/api/
+
+    echo
+
 done
 
