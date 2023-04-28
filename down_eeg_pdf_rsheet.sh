@@ -7,6 +7,8 @@ Provide REDCap token and /path/to/nda_root/network folder"""
     exit
 fi
 
+export PATH=/data/predict1/miniconda3/bin:$PATH
+
 TOKEN=$1
 # NETWORK_PHOENIX=/data/predict/data_from_nda/Pronet
 NETWORK_PHOENIX=$2/PHOENIX/PROTECTED/
@@ -33,7 +35,6 @@ do
     # find arm
     # _find_eeg_event.py network_directory figures_directory subject session(date)
     arm=`/data/predict1/eeg-qc-dash/_find_eeg_event.py $2 $d $sub $ses`
-    
 
     if [ -z $arm ]
     then
