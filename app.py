@@ -49,9 +49,11 @@ sites=sites2.copy()
 
 score_options=[
     {'label':'-9 | Unchecked','value':-9},
-    {'label':'1 | Poor','value':1},
-    {'label':'2 | Average','value':2},
-    {'label':'3 | Good','value':3},
+    {'label':'-8 | Ignore','value':-8},
+    {'label':'-7 | Under Review','value':-7},
+    {'label':'1 | Fail','value':1},
+    {'label':'2 | Some Usable','value':2},
+    {'label':'3 | Pass','value':3},
     {'label':'4 | Excellent','value':4}
 ]
 
