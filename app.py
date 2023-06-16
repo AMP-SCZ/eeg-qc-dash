@@ -39,7 +39,7 @@ log.setLevel(logging.ERROR)
 
 ALT_IMG=pjoin(URL_PREFIX,'blank.png')
 
-with open('sites.json') as f:
+with open('subject-id-gen/sites.json') as f:
     sites= json.load(f)
 
 sites2=[]
