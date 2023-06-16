@@ -1,0 +1,3 @@
+[submodule "subject-id-gen"]
+	path = subject-id-gen
+	url = git@github.com:AMP-SCZ/subject-id-gen.git
