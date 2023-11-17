@@ -8,7 +8,7 @@ from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 
 from os.path import isfile, isdir, abspath, join as pjoin, dirname, splitext, basename
-from os import makedirs, getenv, remove, listdir
+from os import makedirs, getenv, remove, listdir, stat
 
 import re, pickle
 from datetime import datetime, timedelta
@@ -17,6 +17,7 @@ import numpy as np
 import logging
 from glob import glob
 import json
+from time import time
 
 from subprocess import check_call
 
@@ -582,7 +583,21 @@ def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
 def save_data(click,scores,comments,ids,props,passwd):
 
     changed = [p['prop_id'] for p in callback_context.triggered][0]
-    if not ('save' in changed and props):
+    
+    if not props:
+        raise PreventUpdate
+
+    # force save
+    if 'save' in changed:
+        pass
+    # autosave every 30 seconds
+    elif 'sub_ses' in changed:
+        if isfile(props_file):
+            mtime=stat(props_file).st_mtime
+            if time()-mtime<30:
+                raise PreventUpdate
+    # rest of changed values do not matter to this function
+    else:
         raise PreventUpdate
 
     print('executing save_data')
