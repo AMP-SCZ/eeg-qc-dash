@@ -589,7 +589,6 @@ def save_data(click,scores,comments,ids,props,passwd):
     if not ('save' in changed and props):
         raise PreventUpdate
 
-
     return _save_data(ids,scores,comments,props,passwd)
 
 
