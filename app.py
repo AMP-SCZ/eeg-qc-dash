@@ -8,7 +8,7 @@ from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 
 from os.path import isfile, isdir, abspath, join as pjoin, dirname, splitext, basename
-from os import makedirs, getenv, remove, listdir, stat
+from os import makedirs, getenv, remove, listdir
 
 import re, pickle
 from datetime import datetime, timedelta
@@ -17,7 +17,6 @@ import numpy as np
 import logging
 from glob import glob
 import json
-from time import time
 
 from subprocess import check_call
 
