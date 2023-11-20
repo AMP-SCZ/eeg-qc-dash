@@ -184,13 +184,17 @@ https://github.com/AMP-SCZ/eeg-qc-dash
         html.Br(),
 
         dcc.Store(id='properties'),
+        # 30 seconds interval for autosave
+        dcc.Interval(id='interval',interval=30000),
         html.Br(),
         html.Br(),
         html.Br(),
         html.Br(),
         html.Br(),
 
-        dbc.Navbar([html.Button('Save', id='save', n_clicks=0), html.Div(id='last-saved')],
+        dbc.Navbar([html.Button('Save', id='save', n_clicks=0),
+            html.Div(id='last-saved'),
+            html.Div(id='last-saved-auto')],
             fixed='bottom',
             color='white'
         )
@@ -583,28 +587,31 @@ def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
 def save_data(click,scores,comments,ids,props,passwd):
 
     changed = [p['prop_id'] for p in callback_context.triggered][0]
-    
-    if not props:
+    if not ('save' in changed and props):
         raise PreventUpdate
 
-    # force save
-    if 'save' in changed:
-        pass
-    # autosave score right away
-    elif 'sub_ses' in changed and 'sub_ses-1' not in changed:
-        pass
-    # autosave comment characters every 15 seconds
-    elif 'sub_ses-1' in changed:
-        if isfile(props_file):
-            mtime=stat(props_file).st_mtime
-            if time()-mtime<15:
-                raise PreventUpdate
-    # rest of changed values do not matter to this function
-    else:
-        raise PreventUpdate
+
+    return _save_data(ids,scores,comments,props,passwd)
+
+
+@app.callback(Output('last-saved-auto','children'),
+    [Input('interval','n_intervals'),
+    Input({'sub_ses':ALL},'value'),
+    Input({'sub_ses-1':ALL},'value'),
+    Input({'sub_ses':ALL},'id'),
+    Input('properties','data'),
+    Input('passwd','value')])
+def auto_save_data(interval,scores,comments,ids,props,passwd):
+    
+    if interval and props:
+        return _save_data(ids,scores,comments,props,passwd)
+    
+    raise PreventUpdate
+    
+
+def _save_data(ids,scores,comments,props,passwd):
 
     print('executing save_data')
-    
     
     # update changed scores
     for n,s,c in zip(ids,scores,comments):
