@@ -25,12 +25,12 @@ server=Flask(__name__)
 
 SCRIPTDIR=dirname(abspath(__file__))
 
-# initial list of Figures
 ROOTDIR= getenv("EEG_QC_PHOENIX")
 URL_PREFIX= getenv("DASH_URL_BASE_PATHNAME",'')
 if not ROOTDIR:
     print('Define env var EEG_QC_PHOENIX and try again')
     exit(1)
+AUTOSAVE= int(getenv('AUTOSAVE',0))
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP,'styles.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG QC', assets_folder=ROOTDIR, assets_url_path="/",server=server)
@@ -602,7 +602,7 @@ def save_data(click,scores,comments,ids,props,passwd):
     Input('passwd','value')])
 def auto_save_data(click,interval,scores,comments,ids,props,passwd):
     # do not autosave for the first 6*30=180 seconds
-    if interval and props and interval>=6:
+    if AUTOSAVE and interval and props and interval>=6:
         return _save_data(ids,scores,comments,props,passwd)
     
     raise PreventUpdate
