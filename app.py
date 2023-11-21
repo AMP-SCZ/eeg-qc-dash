@@ -593,15 +593,16 @@ def save_data(click,scores,comments,ids,props,passwd):
 
 
 @app.callback(Output('last-saved-auto','children'),
-    [Input('interval','n_intervals'),
+    [Input('global-filter','n_clicks'),
+    Input('interval','n_intervals'),
     Input({'sub_ses':ALL},'value'),
     Input({'sub_ses-1':ALL},'value'),
     Input({'sub_ses':ALL},'id'),
     Input('properties','data'),
     Input('passwd','value')])
-def auto_save_data(interval,scores,comments,ids,props,passwd):
-    
-    if interval and props:
+def auto_save_data(click,interval,scores,comments,ids,props,passwd):
+    # do not autosave for the first 6*30=180 seconds
+    if interval and props and interval>=6:
         return _save_data(ids,scores,comments,props,passwd)
     
     raise PreventUpdate
