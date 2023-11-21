@@ -601,8 +601,8 @@ def save_data(click,scores,comments,ids,props,passwd):
     Input('properties','data'),
     Input('passwd','value')])
 def auto_save_data(click,interval,scores,comments,ids,props,passwd):
-    # do not autosave for the first 6*30=180 seconds
-    if AUTOSAVE and interval and props and interval>=6:
+    # do not autosave for the first 3*30=90 seconds
+    if AUTOSAVE and interval and props and interval>=3:
         return _save_data(ids,scores,comments,props,passwd)
     
     raise PreventUpdate
