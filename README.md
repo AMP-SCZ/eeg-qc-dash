@@ -143,3 +143,9 @@ Oct 25 15:15:39 rc-predict setroubleshoot: SELinux is preventing nginx from conn
 To circumvent this permission deficit, we had to add a policy to SELinux according to [*Extend the httpd_t Domain Permissions*](https://www.nginx.com/blog/using-nginx-plus-with-selinux/).
 
 The `httpd_can_network_connect` bool was set to 1 as usual.
+
+The default uWSGI [logging](https://uwsgi-docs.readthedocs.io/en/latest/LogFormat.html#uwsgi-default-logging) was extensive.
+It may be helpful to limit that as:
+
+> --logformat "%(addr) {%(vars) vars in %(pktsize) bytes} [%(ctime)] %(method) %(uri) => generated %(rsize) bytes in %(msecs) msecs (%(proto) %(status))"
+
