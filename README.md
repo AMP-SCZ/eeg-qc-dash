@@ -144,8 +144,22 @@ To circumvent this permission deficit, we had to add a policy to SELinux accordi
 
 The `httpd_can_network_connect` bool was set to 1 as usual.
 
+#### Few more uWSGI hacks
+
+*
 The default uWSGI [logging](https://uwsgi-docs.readthedocs.io/en/latest/LogFormat.html#uwsgi-default-logging) was extensive.
 It may be helpful to limit that as:
 
 > --logformat "%(addr) {%(vars) vars in %(pktsize) bytes} [%(ctime)] %(method) %(uri) => generated %(rsize) bytes in %(msecs) msecs (%(proto) %(status))"
+
+
+*
+Windows client from Chrome and Edge browsers was generating `invalid request block size: 4132 (max 4096)...skip` error.
+We solved this by using [--buffer-size 8192](https://stackoverflow.com/a/26941287/11932012) argument.
+
+*
+The app was failing to render hundreds of images in a web page.
+We solved this by increasing the number of processes used: `--processes 4`
+Before, we explored the idea of increasing the number of open connections: [--listen 128](https://stackoverflow.com/a/12340078/11932012)
+but that did not work.
 
