@@ -410,6 +410,10 @@ def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
             props[sub_ses]=-9
             # comment
             props[sub_ses+'-1']=''
+        
+        if f'{sub}_{ses}-2' not in props:
+            # auto score
+            props[sub_ses+'-2']=''
 
         # do not show averages in main table
         # this check is placed here to allow
@@ -464,7 +468,12 @@ def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
                     dcc.Textarea(value=props[sub_ses+'-1'],
                         id= {'sub_ses-1':sub_ses},
                         placeholder='comment',
-                        rows=30,cols=20)
+                        rows=30,cols=20),
+                    html.Br(),
+                    dcc.Textarea(value=props[sub_ses+'-2'],
+                        id= {'sub_ses-2':sub_ses},
+                        placeholder='',
+                        rows=1,cols=1)
                     ])]+ \
                 [html.Td(
                     html.A(
@@ -580,16 +589,17 @@ def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
     [Input('save','n_clicks'),
     Input({'sub_ses':ALL},'value'),
     Input({'sub_ses-1':ALL},'value'),
+    Input({'sub_ses-2':ALL},'value'),
     Input({'sub_ses':ALL},'id'),
     Input('properties','data'),
     Input('passwd','value')])
-def save_data(click,scores,comments,ids,props,passwd):
+def save_data(click,scores,comments,auto_scores,ids,props,passwd):
 
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     if not ('save' in changed and props):
         raise PreventUpdate
 
-    return _save_data(ids,scores,comments,props,passwd)
+    return _save_data(ids,scores,comments,auto_scores,props,passwd)
 
 
 @app.callback(Output('last-saved-auto','children'),
@@ -597,26 +607,28 @@ def save_data(click,scores,comments,ids,props,passwd):
     Input('interval','n_intervals'),
     Input({'sub_ses':ALL},'value'),
     Input({'sub_ses-1':ALL},'value'),
+    Input({'sub_ses-2':ALL},'value'),
     Input({'sub_ses':ALL},'id'),
     Input('properties','data'),
     Input('passwd','value')])
-def auto_save_data(click,interval,scores,comments,ids,props,passwd):
+def auto_save_data(click,interval,scores,comments,auto_scores,ids,props,passwd):
     # do not autosave for the first 3*30=90 seconds
     if AUTOSAVE and interval and props and interval>=3:
-        return _save_data(ids,scores,comments,props,passwd)
+        return _save_data(ids,scores,comments,auto_scores,props,passwd)
     
     raise PreventUpdate
     
 
-def _save_data(ids,scores,comments,props,passwd):
+def _save_data(ids,scores,comment,auto_scores,props,passwd):
 
     print('executing save_data')
     
     # update changed scores
-    for n,s,c in zip(ids,scores,comments):
+    for n,s,c,a in zip(ids,scores,comments,auto_scores):
         sub_ses= n['sub_ses']
         props[sub_ses]=s
         props[sub_ses+'-1']=c
+        props[sub_ses+'-2']=a
 
     # print(props)
 
