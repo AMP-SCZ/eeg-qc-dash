@@ -25,7 +25,9 @@ props2=props.copy()
 for i,row in df.iterrows():
     key='{}_{}'.format(row['subject'],row['session'])
     if key in props:
-        props2[key+'-2']=row['score']
+        if props[key]==-9:
+            if not pd.isna(row['score']):
+                props2[key]=row['score']
 
 with open(props_file,'wb') as f:
     pickle.dump(props2,f)
