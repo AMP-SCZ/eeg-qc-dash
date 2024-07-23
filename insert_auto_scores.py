@@ -11,6 +11,23 @@ Usage: {__file__}
 No argument is needed.''')
     exit()
 
+
+def count(_props):
+
+    freq={}
+    for k,v in _props.items():
+        if k.endswith('-1'):
+            pass
+        else:
+            if v in freq:
+                freq[v]+=1
+            else:
+                freq[v]=0
+
+    print(freq)
+    print('Total',sum(freq.values()))
+
+
 dir_bak=getcwd()
 chdir('/data/predict1/data_from_nda/')
 
@@ -20,6 +37,9 @@ props_file='.scores.pkl'
 with open(props_file,'rb') as f:
     props= pickle.load(f)
 
+print('Before modification count:')
+count(props)
+
 props2=props.copy()
 
 for i,row in df.iterrows():
@@ -28,6 +48,9 @@ for i,row in df.iterrows():
         if props[key]==-9:
             if not pd.isna(row['score']):
                 props2[key]=row['score']
+
+print('\nAfter modification count:')
+count(props2)
 
 with open(props_file,'wb') as f:
     pickle.dump(props2,f)
