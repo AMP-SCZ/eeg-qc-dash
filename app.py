@@ -152,13 +152,17 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             ),
 
             # QC score filter
-            dbc.Col(html.Div(dcc.Dropdown(id='score_low', className='ddown', placeholder='score_low',
-                options=score_options)),
+            dbc.Col(html.Div([dcc.Dropdown(id='score_low', className='ddown', placeholder='score_low',
+                options=score_options),
+                'Score low'
+                ]),
                 width=2
             ),
 
-            dbc.Col(html.Div(dcc.Dropdown(id='score_high', className='ddown', placeholder='score_high',
-                options=score_options)),
+            dbc.Col(html.Div([dcc.Dropdown(id='score_high', className='ddown', placeholder='score_high',
+                options=score_options),
+                'Score high'
+                ]),
                 width=2
             )
         ]),
