@@ -167,6 +167,8 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             )
         ]),
 
+        html.Br(),
+
         dbc.Row([
             # column filter
             dbc.Col(html.Div(dcc.Dropdown(id='qcimg', className='ddown',
