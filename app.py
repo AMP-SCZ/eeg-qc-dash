@@ -177,7 +177,11 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 multi=True)),
                 width=8
             ),
+        ]),
+        
+        html.Br(),
 
+        dbc.Row([
             # filter button
             dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0))
             
