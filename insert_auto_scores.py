@@ -22,7 +22,7 @@ def count(_props):
             if v in freq:
                 freq[v]+=1
             else:
-                freq[v]=0
+                freq[v]=1
 
     print(freq)
     print('Total',sum(freq.values()))
