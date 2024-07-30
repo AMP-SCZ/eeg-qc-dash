@@ -50,7 +50,7 @@ sites=sites2.copy()
 score_options=[
     {'label':'14 | Auto 4','value':14},
     {'label':'13 | Auto 3','value':13},
-    {'label':'10 | Auto 0','value':10},
+    {'label':'10 | Auto < 3','value':10},
     {'label':'-9 | Unchecked','value':-9},
     {'label':'-8 | Ignore','value':-8},
     {'label':'-7 | Under Review','value':-7},
