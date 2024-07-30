@@ -42,18 +42,21 @@ count(props)
 
 props2=props.copy()
 
+modified=False
 for i,row in df.iterrows():
     key='{}_{}'.format(row['subject'],row['session'])
     if key in props:
         if props[key]==-9:
             if not pd.isna(row['score']):
                 props2[key]=row['score']
+                modified=True
 
-print('\nAfter modification count:')
-count(props2)
+if modified:
+    print('\nAfter modification count:')
+    count(props2)
 
-with open(props_file,'wb') as f:
-    pickle.dump(props2,f)
+    with open(props_file,'wb') as f:
+        pickle.dump(props2,f)
 
 chdir(dir_bak)
 
