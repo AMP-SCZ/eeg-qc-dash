@@ -73,7 +73,7 @@ app.layout= html.Div(
 ### EEG Quality Checking Tool
 Developed by Tashrif Billah, Sylvain Bouix, Spero Nicholas, Daniel Mathalon, and Gregory Light
 
-https://github.com/AMP-SCZ/eeg-qc-dash
+https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.6326486.svg)]
 (https://doi.org/10.5281/zenodo.6326486)
             """)),
