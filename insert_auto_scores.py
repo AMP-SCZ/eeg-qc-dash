@@ -50,6 +50,11 @@ for i,row in df.iterrows():
             if not pd.isna(row['score']):
                 props2[key]=row['score']
                 modified=True
+                
+    else:
+        props2[key]=row['score']
+        props2[key+'-1']=''
+        modified=True
 
 if modified:
     print('\nAfter modification count:')
