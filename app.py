@@ -48,6 +48,9 @@ for s in sites:
 sites=sites2.copy()
 
 score_options=[
+    {'label':'14 | Auto 4','value':14},
+    {'label':'13 | Auto 3','value':13},
+    {'label':'10 | Auto < 3','value':10},
     {'label':'-9 | Unchecked','value':-9},
     {'label':'-8 | Ignore','value':-8},
     {'label':'-7 | Under Review','value':-7},
@@ -70,7 +73,7 @@ app.layout= html.Div(
 ### EEG Quality Checking Tool
 Developed by Tashrif Billah, Sylvain Bouix, Spero Nicholas, Daniel Mathalon, and Gregory Light
 
-https://github.com/AMP-SCZ/eeg-qc-dash
+https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
 [![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.6326486.svg)]
 (https://doi.org/10.5281/zenodo.6326486)
             """)),
@@ -149,11 +152,22 @@ https://github.com/AMP-SCZ/eeg-qc-dash
             ),
 
             # QC score filter
-            dbc.Col(html.Div(dcc.Dropdown(id='score', className='ddown', placeholder='score',
-                options=score_options)),
+            dbc.Col(html.Div([dcc.Dropdown(id='score_low', className='ddown', placeholder='score_low',
+                options=score_options),
+                'Score low'
+                ]),
+                width=2
+            ),
+
+            dbc.Col(html.Div([dcc.Dropdown(id='score_high', className='ddown', placeholder='score_high',
+                options=score_options),
+                'Score high'
+                ]),
                 width=2
             )
         ]),
+
+        html.Br(),
 
         dbc.Row([
             # column filter
@@ -163,7 +177,11 @@ https://github.com/AMP-SCZ/eeg-qc-dash
                 multi=True)),
                 width=8
             ),
+        ]),
+        
+        html.Br(),
 
+        dbc.Row([
             # filter button
             dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0))
             
@@ -268,12 +286,13 @@ def set_dates(click):
     [Input('start','value'), Input('end','value'),
     Input('site','value'),
     Input('qcimg','value'),
-    Input('score','value'),
+    Input('score_low','value'),
+    Input('score_high','value'),
     Input('tech','value'),
     Input('sort-order','value'),
     Input('global-filter', 'n_clicks'),
     Input('passwd','value')])
-def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
+def render_table(start, end, site, qcimg, score_low, score_high, tech, order, click, passwd):
     
     changed = [p['prop_id'] for p in callback_context.triggered][0]
     if not ('global-filter' in changed and qcimg and passwd):
@@ -440,7 +459,9 @@ def render_table(start, end, site, qcimg, score, tech, order, click, passwd):
         # filter by QC score
         # although this filter is similar to by date and by site
         # it is placed inside the for loop to take advantage of sub_ses
-        if score is not None and props[f'{sub}_{ses}']!=score:
+        if score_low is not None and props[f'{sub}_{ses}']<score_low:
+            continue
+        if score_high is not None  and props[f'{sub}_{ses}']>score_high:
             continue
 
         # example run sheet:
