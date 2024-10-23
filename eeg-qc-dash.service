@@ -1,0 +1,17 @@
+[Unit]
+Description=EEG web app production instance served at https://predict-general.bwh.harvard.edu/eegqc/
+After=network-online.target nss-lookup.target
+Wants=network-online.target nss-lookup.target
+
+[Service]
+User=sf284
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/bin/sleep 30
+ExecStart=/opt/eeg-qc-dash/start_server.sh
+ExecStop=pkill -f uwsgi
+KillMode=process
+TimeoutSec=60
+
+[Install]
+WantedBy=multi-user.target
