@@ -25,7 +25,7 @@ do
     # echo ${sub}_${ses}
     outfile=${d}/${sub}_${ses}_runSheet.pdf
 
-    # there is no run sheet for GRANavg, LAavg, etc. subjets
+    # there is no run sheet for GRANavg, LAavg, etc. subjects
     if [[ $sub == *avg ]]
     then
         continue 1
