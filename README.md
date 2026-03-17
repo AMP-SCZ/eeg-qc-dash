@@ -65,6 +65,13 @@ Then uWSGI was built as above. `pip install -r eeg-qc-dash/requirements.txt` was
 
 ### Environment
 
+Make sure to enable http/https service through firewall before launching `uwsgi`:
+
+```
+firewall-cmd --add-service=http --add-service=https
+firewall-cmd --permanent --add-service=http --add-service=https
+```
+
 Regardless of Flask or uWSGI server, the following environment variables are defined on the terminal:
 
 ```bash
