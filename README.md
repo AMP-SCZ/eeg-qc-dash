@@ -140,7 +140,7 @@ $ tail -f /var/log/messages
 Oct 25 15:15:39 rc-predict setroubleshoot: SELinux is preventing nginx from connectto access on the unix_stream_socket /run/uwsgi.sock. For complete SELinux messages run: sealert -l 262f5c36-68ca-4eeb-a9ff-661a2f94a64e
 ```
 
-To circumvent this permission deficit, we had to add a policy to SELinux according to [*Extend the httpd_t Domain Permissions*](https://www.nginx.com/blog/using-nginx-plus-with-selinux/).
+To circumvent this permission deficit, we had to add a policy to SELinux according to the SELinux message.
 
 The `httpd_can_network_connect` bool was set to 1 as usual.
 
