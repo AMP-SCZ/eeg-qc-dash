@@ -124,7 +124,7 @@ and [uwsgi-docs](https://uwsgi-docs.readthedocs.io/en/latest/Nginx.html#configur
 ```cfg
     location /eegqc/ {
       include uwsgi_params;
-      uwsgi_pass unix:///run/uwsgi.sock;
+      uwsgi_pass unix:///run/uwsgi-eeg.sock;
     }
 ```
 
