@@ -112,7 +112,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
                 dcc.Input(id='start',placeholder='yyyy/mm/dd',debounce=True),
                 html.Br(),
                 'Earliest'
-            ], width='auto'),
+            ], width=1),
 
             dbc.Col('←—→', style={'margin-top':'10px'}, width='auto'),
 
@@ -120,14 +120,14 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
                 dcc.Input(id='end',placeholder='yyyy/mm/dd',debounce=True),
                 html.Br(),
                 'Latest'
-            ], width='auto'),
+            ], width=1),
 
 
             # site filter
             dbc.Col(html.Div(dcc.Dropdown(id='site',placeholder='site',
                 options=sites,
-                value='')),
-                width=2
+                )),
+                width='auto'
             ),
 
             # password for site
@@ -148,7 +148,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
                 value='Latest first'),
                 'Sort order'
                 ]),
-                width=2
+                width='auto'
             ),
 
             # QC score filter
@@ -156,14 +156,14 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
                 options=score_options),
                 'Score low'
                 ]),
-                width=2
+                width='auto'
             ),
 
             dbc.Col(html.Div([dcc.Dropdown(id='score_high', className='ddown', placeholder='score_high',
                 options=score_options),
                 'Score high'
                 ]),
-                width=2
+                width='auto'
             )
         ]),
 
@@ -335,7 +335,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
         
         dirs2=[]
         for d in dirs:
-            ses= int(re.search('ses-(.+?)/', d).group(1))
+            ses= int(re.search('eeg/(.+?)/', d).group(1))
             if ses>=start and ses<=end:
                 dirs2.append(d)
         
@@ -420,7 +420,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
         
         parts= d.split('/')
         sub= parts[-4]
-        ses= parts[-2].split('-')[1]
+        ses= parts[-2]
         sub_ses= f'{sub}_{ses}'
        
         # initialize scores 
@@ -506,7 +506,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
         bordered=True,
         hover=True)
 
-
+    """
     # populate avg-table
     # reset dirs
     dirs= dirs_all.copy()
@@ -523,7 +523,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
                 break
     
     dirs= dirs2.copy()
-    
+    """
 
     # sticky-top table
     headers= ['Index','Subject','Session','QC Score']+ qcimg
@@ -533,7 +533,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
     for d in dirs:
         parts= d.split('/')
         sub= parts[-4]
-        ses= parts[-2].split('-')[1]
+        ses= parts[-2]
         sub_ses= f'{sub}_{ses}'
         imgs= glob(f'{d}/*[!QC].png')
                 
