@@ -170,3 +170,13 @@ We solved this by increasing the number of processes used: `--processes 4`
 Before, we explored the idea of increasing the number of open connections: [--listen 128](https://stackoverflow.com/a/12340078/11932012)
 but that did not work.
 
+
+### 3. Debug
+
+In April 2026, we found that `DASH_DEBUG` variable is good for Flask server only. It has no effect though `app.run_server(debug=None, host='localhost')` is set (https://community.plotly.com/t/dash-debug-variable-does-not-work/63079).
+
+To enable hot reloading every two seconds through uWSGI, use `--py-autoreload 2` flag:
+
+> uwsgi --socket /run/uwsgi.sock --wsgi-file uwsgi.py --master --processes 1 --chmod-socket=666 --py-autoreload 2
+
+
