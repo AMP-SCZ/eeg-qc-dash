@@ -506,7 +506,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
         bordered=True,
         hover=True)
 
-    """
+    
     # populate avg-table
     # reset dirs
     dirs= dirs_all.copy()
@@ -523,7 +523,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
                 break
     
     dirs= dirs2.copy()
-    """
+    
 
     # sticky-top table
     headers= ['Index','Subject','Session','QC Score']+ qcimg
