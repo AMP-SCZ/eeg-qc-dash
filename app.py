@@ -30,7 +30,6 @@ URL_PREFIX= getenv("DASH_URL_BASE_PATHNAME",'')
 if not ROOTDIR:
     print('Define env var EEG_QC_PHOENIX and try again')
     exit(1)
-AUTOSAVE= int(getenv('AUTOSAVE',0))
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP,'styles.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG QC', assets_folder=ROOTDIR, assets_url_path="/",server=server)
@@ -201,8 +200,6 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
         html.Br(),
 
         dcc.Store(id='properties'),
-        # 30 seconds interval for autosave
-        dcc.Interval(id='interval',interval=30000),
         html.Br(),
         html.Br(),
         html.Br(),
@@ -210,8 +207,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
         html.Br(),
 
         dbc.Navbar([html.Button('Save', id='save', n_clicks=0),
-            html.Div(id='last-saved'),
-            html.Div(id='last-saved-auto')],
+            html.Div(id='last-saved')],
             fixed='bottom',
             color='white'
         )
@@ -612,22 +608,7 @@ def save_data(click,scores,comments,ids,props,passwd):
 
     return _save_data(ids,scores,comments,props,passwd)
 
-
-@app.callback(Output('last-saved-auto','children'),
-    [Input('global-filter','n_clicks'),
-    Input('interval','n_intervals'),
-    Input({'sub_ses':ALL},'value'),
-    Input({'sub_ses-1':ALL},'value'),
-    Input({'sub_ses':ALL},'id'),
-    Input('properties','data'),
-    Input('passwd','value')])
-def auto_save_data(click,interval,scores,comments,ids,props,passwd):
-    # do not autosave for the first 3*30=90 seconds
-    if AUTOSAVE and interval and props and interval>=3:
-        return _save_data(ids,scores,comments,props,passwd)
-    
-    raise PreventUpdate
-    
+ 
 
 def _save_data(ids,scores,comments,props,passwd):
 
