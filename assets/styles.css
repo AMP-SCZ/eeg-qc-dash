@@ -10,15 +10,6 @@ body {
     
 }
 
-
-input#start {
-    margin-right: 10px;
-}
-
-input {
-    width: 90px;
-}
-
 #global-filter {
     background: yellow;
 }
