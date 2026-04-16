@@ -31,7 +31,8 @@ if not ROOTDIR:
     print('Define env var EEG_QC_PHOENIX and try again')
     exit(1)
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP,'styles.css']
+# external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP,'styles.css']
+external_stylesheets = [dbc.themes.BOOTSTRAP,'styles.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG QC', assets_folder=ROOTDIR, assets_url_path="/",server=server)
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
@@ -182,7 +183,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
 
         dbc.Row([
             # filter button
-            dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0))
+            dbc.Col(html.Button('FILTER', id='global-filter', n_clicks=0))
             
         ]),
 
@@ -206,7 +207,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
         html.Br(),
         html.Br(),
 
-        dbc.Navbar([html.Button('Save', id='save', n_clicks=0),
+        dbc.Navbar([html.Button('SAVE', id='save', n_clicks=0),
             html.Div(id='last-saved')],
             fixed='bottom',
             color='white'
@@ -477,11 +478,12 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
                 [html.Td([
                     dcc.Dropdown(value=props[sub_ses],
                         id= {'sub_ses':sub_ses},
-                        options= score_options),
+                        options= score_options,
+                        style= {'width':'170px'}),
                     dcc.Textarea(value=props[sub_ses+'-1'],
                         id= {'sub_ses-1':sub_ses},
                         placeholder='comment',
-                        rows=30,cols=20)
+                        rows=5,cols=20)
                     ])]+ \
                 [html.Td(
                     html.A(
