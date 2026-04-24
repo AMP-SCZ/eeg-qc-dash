@@ -488,7 +488,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
                 [html.Td(
                     html.A(
                         html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
-                            width='100%',height='auto'
+                            width='100%',height='auto',id='thumbnail'
                         ),
                         href=img.replace(ROOTDIR,URL_PREFIX),
                         target='_blank'
@@ -570,7 +570,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
                 [html.Td(
                     html.A(
                         html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
-                            width='100%',height='auto'
+                            width='100%',height='auto',id='thumbnail'
                         ),
                         href=img.replace(ROOTDIR,URL_PREFIX),
                         target='_blank'
