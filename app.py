@@ -560,12 +560,13 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
                     dcc.Dropdown(
                         value=props[sub_ses],
                         id= {'sub_ses':sub_ses},
-                        options= score_options),
+                        options= score_options,
+                        style= {'width':'170px'}),
                     dcc.Textarea(
                         value=props[sub_ses+'-1'],
                         id= {'sub_ses-1':sub_ses},
                         placeholder='comment',
-                        rows=30,cols=20)
+                        rows=5,cols=20)
                     ])]+ \
                 [html.Td(
                     html.A(
