@@ -30,9 +30,9 @@ URL_PREFIX= getenv("DASH_URL_BASE_PATHNAME",'')
 if not ROOTDIR:
     print('Define env var EEG_QC_PHOENIX and try again')
     exit(1)
-AUTOSAVE= int(getenv('AUTOSAVE',0))
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP,'styles.css']
+# external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css',dbc.themes.BOOTSTRAP,'styles.css']
+external_stylesheets = [dbc.themes.BOOTSTRAP,'styles.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, title='EEG QC', assets_folder=ROOTDIR, assets_url_path="/",server=server)
 log= logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
@@ -112,7 +112,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
                 dcc.Input(id='start',placeholder='yyyy/mm/dd',debounce=True),
                 html.Br(),
                 'Earliest'
-            ], width='auto'),
+            ], width=1),
 
             dbc.Col('←—→', style={'margin-top':'10px'}, width='auto'),
 
@@ -120,14 +120,14 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
                 dcc.Input(id='end',placeholder='yyyy/mm/dd',debounce=True),
                 html.Br(),
                 'Latest'
-            ], width='auto'),
+            ], width=1),
 
 
             # site filter
             dbc.Col(html.Div(dcc.Dropdown(id='site',placeholder='site',
                 options=sites,
-                value='')),
-                width=2
+                )),
+                width='auto'
             ),
 
             # password for site
@@ -148,7 +148,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
                 value='Latest first'),
                 'Sort order'
                 ]),
-                width=2
+                width='auto'
             ),
 
             # QC score filter
@@ -156,14 +156,14 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
                 options=score_options),
                 'Score low'
                 ]),
-                width=2
+                width='auto'
             ),
 
             dbc.Col(html.Div([dcc.Dropdown(id='score_high', className='ddown', placeholder='score_high',
                 options=score_options),
                 'Score high'
                 ]),
-                width=2
+                width='auto'
             )
         ]),
 
@@ -183,7 +183,7 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
 
         dbc.Row([
             # filter button
-            dbc.Col(html.Button('Filter', id='global-filter', n_clicks=0))
+            dbc.Col(html.Button('FILTER', id='global-filter', n_clicks=0))
             
         ]),
 
@@ -201,17 +201,14 @@ https://github.com/AMP-SCZ/eeg-qc-dash &nbsp
         html.Br(),
 
         dcc.Store(id='properties'),
-        # 30 seconds interval for autosave
-        dcc.Interval(id='interval',interval=30000),
         html.Br(),
         html.Br(),
         html.Br(),
         html.Br(),
         html.Br(),
 
-        dbc.Navbar([html.Button('Save', id='save', n_clicks=0),
-            html.Div(id='last-saved'),
-            html.Div(id='last-saved-auto')],
+        dbc.Navbar([html.Button('SAVE', id='save', n_clicks=0),
+            html.Div(id='last-saved')],
             fixed='bottom',
             color='white'
         )
@@ -335,7 +332,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
         
         dirs2=[]
         for d in dirs:
-            ses= int(re.search('ses-(.+?)/', d).group(1))
+            ses= int(re.search('eeg/(.+?)/', d).group(1))
             if ses>=start and ses<=end:
                 dirs2.append(d)
         
@@ -420,7 +417,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
         
         parts= d.split('/')
         sub= parts[-4]
-        ses= parts[-2].split('-')[1]
+        ses= parts[-2]
         sub_ses= f'{sub}_{ses}'
        
         # initialize scores 
@@ -481,16 +478,17 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
                 [html.Td([
                     dcc.Dropdown(value=props[sub_ses],
                         id= {'sub_ses':sub_ses},
-                        options= score_options),
+                        options= score_options,
+                        style= {'width':'170px'}),
                     dcc.Textarea(value=props[sub_ses+'-1'],
                         id= {'sub_ses-1':sub_ses},
                         placeholder='comment',
-                        rows=30,cols=20)
+                        rows=5,cols=20)
                     ])]+ \
                 [html.Td(
                     html.A(
                         html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
-                            width='100%',height='auto'
+                            width='100%',height='auto',id='thumbnail'
                         ),
                         href=img.replace(ROOTDIR,URL_PREFIX),
                         target='_blank'
@@ -506,7 +504,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
         bordered=True,
         hover=True)
 
-
+    
     # populate avg-table
     # reset dirs
     dirs= dirs_all.copy()
@@ -533,7 +531,7 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
     for d in dirs:
         parts= d.split('/')
         sub= parts[-4]
-        ses= parts[-2].split('-')[1]
+        ses= parts[-2]
         sub_ses= f'{sub}_{ses}'
         imgs= glob(f'{d}/*[!QC].png')
                 
@@ -562,17 +560,18 @@ def render_table(start, end, site, qcimg, score_low, score_high, tech, order, cl
                     dcc.Dropdown(
                         value=props[sub_ses],
                         id= {'sub_ses':sub_ses},
-                        options= score_options),
+                        options= score_options,
+                        style= {'width':'170px'}),
                     dcc.Textarea(
                         value=props[sub_ses+'-1'],
                         id= {'sub_ses-1':sub_ses},
                         placeholder='comment',
-                        rows=30,cols=20)
+                        rows=5,cols=20)
                     ])]+ \
                 [html.Td(
                     html.A(
                         html.Img(src=img.replace(ROOTDIR,URL_PREFIX),
-                            width='100%',height='auto'
+                            width='100%',height='auto',id='thumbnail'
                         ),
                         href=img.replace(ROOTDIR,URL_PREFIX),
                         target='_blank'
@@ -612,22 +611,7 @@ def save_data(click,scores,comments,ids,props,passwd):
 
     return _save_data(ids,scores,comments,props,passwd)
 
-
-@app.callback(Output('last-saved-auto','children'),
-    [Input('global-filter','n_clicks'),
-    Input('interval','n_intervals'),
-    Input({'sub_ses':ALL},'value'),
-    Input({'sub_ses-1':ALL},'value'),
-    Input({'sub_ses':ALL},'id'),
-    Input('properties','data'),
-    Input('passwd','value')])
-def auto_save_data(click,interval,scores,comments,ids,props,passwd):
-    # do not autosave for the first 3*30=90 seconds
-    if AUTOSAVE and interval and props and interval>=3:
-        return _save_data(ids,scores,comments,props,passwd)
-    
-    raise PreventUpdate
-    
+ 
 
 def _save_data(ids,scores,comments,props,passwd):
 

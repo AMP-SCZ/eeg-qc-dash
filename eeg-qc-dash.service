@@ -1,5 +1,5 @@
 [Unit]
-Description=EEG web app production instance served at https://predict-general.bwh.harvard.edu/eegqc/
+Description=EEG web app production instance
 After=network-online.target nss-lookup.target
 Wants=network-online.target nss-lookup.target
 

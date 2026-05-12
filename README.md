@@ -143,6 +143,9 @@ and [uwsgi-docs](https://uwsgi-docs.readthedocs.io/en/latest/Nginx.html#configur
 So we used `/run/uwsgi.sock`. Now it could be discovered but SELinux prevented Nginx from writing into it:
 
 ```bash
+$ tail -f /var/log/nginx/error.log
+2026/04/17 11:39:38 [crit] 1204500#1204500: *139 connect() to unix:///run/uwsgi-eeg.sock failed (13: Permission denied) while connecting to upstream, client: 10.156.88.26, server: _, request: "GET /eegqc/nginx-logo.png HTTP/2.0", upstream: "uwsgi://unix:///run/uwsgi-eeg.sock:", host: "clinical-eeg.mgb.org", referrer: "https://clinical-eeg.mgb.org/eegqc/"
+
 $ tail -f /var/log/messages
 Oct 25 15:15:39 rc-predict setroubleshoot: SELinux is preventing nginx from connectto access on the unix_stream_socket /run/uwsgi.sock. For complete SELinux messages run: sealert -l 262f5c36-68ca-4eeb-a9ff-661a2f94a64e
 ```
@@ -169,4 +172,14 @@ The app was failing to render hundreds of images in a web page.
 We solved this by increasing the number of processes used: `--processes 4`
 Before, we explored the idea of increasing the number of open connections: [--listen 128](https://stackoverflow.com/a/12340078/11932012)
 but that did not work.
+
+
+### 3. Debug
+
+In April 2026, we found that `DASH_DEBUG` variable is good for Flask server only. It has no effect though `app.run_server(debug=None, host='localhost')` is set (https://community.plotly.com/t/dash-debug-variable-does-not-work/63079).
+
+To enable hot reloading every two seconds through uWSGI, use `--py-autoreload 2` flag:
+
+> uwsgi --socket /run/uwsgi.sock --wsgi-file uwsgi.py --master --processes 1 --chmod-socket=666 --py-autoreload 2
+
 

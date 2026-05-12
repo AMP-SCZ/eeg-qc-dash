@@ -4,19 +4,15 @@ body {
     // font-weight: bold;
 }
 
+button {
+    padding: 10px 20px;
+    // font-weight: bold;
+}
+
 #ampscz {
     height: 120px;
     width: 120px;
     
-}
-
-
-input#start {
-    margin-right: 10px;
-}
-
-input {
-    width: 90px;
 }
 
 #global-filter {
@@ -31,6 +27,11 @@ input {
 
 img {
     max-width: 300px;
+}
+
+#thumbnail {
+    height: 100px;
+    width: auto;
 }
 
 #avg-table {
