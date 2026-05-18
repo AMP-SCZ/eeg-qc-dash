@@ -37,7 +37,7 @@ following https://docs.python.org/3/using/unix.html#building-python :
 
 ```bash
 # as root
-yum install libffi-devel libxml2-devel
+yum install libffi-devel libxml2-devel openssl-devel
 
 # as non-root
 wget https://www.python.org/ftp/python/3.9.11/Python-3.9.11.tgz
