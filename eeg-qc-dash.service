@@ -9,7 +9,7 @@ Type=oneshot
 RemainAfterExit=yes
 ExecStartPre=/bin/sleep 30
 ExecStart=/opt/eeg-qc-dash/start_server.sh
-ExecStop=pkill -f uwsgi
+ExecStop=/opt/uwsgi-2.0.20/uwsgi --stop /opt/uwsgi.pid
 KillMode=process
 TimeoutSec=60
 
